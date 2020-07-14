@@ -1,4 +1,4 @@
-import python.src.utilities as utilities
+import utilities
 
 
 def get_feb():
