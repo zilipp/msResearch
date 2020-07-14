@@ -4,9 +4,14 @@
 
 #Python
 venv
+env
+__pycache__
 
 #Pycharm
 .idea
+.vscode/
+.DS_Store
 
 #data
 data
+
