@@ -1,4 +1,4 @@
-import measure_femur
+import python.src.measure_femur as measure_femur
 
 
 def main():
