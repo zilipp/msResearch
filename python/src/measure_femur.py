@@ -1,5 +1,6 @@
 # python libraries
 import sys
+import logging
 import numpy as np
 import math
 import copy
@@ -95,13 +96,13 @@ def get_right_part(alpha_shape):
 def get_fml(alpha_shape):
     (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
     fml = maxx - minx
-    print('fml: ', fml)
+    logging.info('fml: {0}'.format(fml))
 
 
 def get_feb(left_bone):
     (left_bone_minx, left_bone_miny, left_bone_maxx, left_bone_maxy) = left_bone.exterior.bounds
     feb = left_bone_maxy - left_bone_miny
-    print('feb: ', feb)
+    logging.info('feb: {0}'.format(feb))
 
 
 def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
@@ -142,7 +143,7 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
     for i in range(len(right_bone_points_ordered)):
         fbml = max(fbml, utilities.distance_point_to_line(p_left, p_left_second, right_bone_points_ordered[i]))
 
-    print('fbml: ', fbml)
+    logging.info('fbml: {0}'.format(fbml))
 
 
 def get_fmld(center_bone_points, show_figure):
@@ -187,7 +188,7 @@ def get_fmld(center_bone_points, show_figure):
         min_line_segment_length = min(dis_cur, min_line_segment_length)
 
     fmld = math.sqrt(min_line_segment_length)
-    print('fmld: ', fmld)
+    logging.info('fmld: {0}'.format(fmld))
 
 
 def get_fhd(right_bone, right_bone_points_ordered):
@@ -288,11 +289,11 @@ def get_fhd(right_bone, right_bone_points_ordered):
             count_decrease = 0
         iterate_idx -= 1
 
-    print('fhd: ', fhd)
+    logging.info('fhd: {0}'.format(fhd))
 
 
 def get_measurement(alpha_shape, show_figure):
-    print('Start measuring femur...')
+    logging.info('Start measuring femur...')
 
     left_bone, left_bone_points_ordered = get_left_part(alpha_shape)
     center_bone, center_bone_points = get_center_part(alpha_shape)

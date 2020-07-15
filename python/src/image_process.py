@@ -1,9 +1,11 @@
 # python libraries
+import logging
 import numpy as np
 import open3d as o3d
 from sklearn.decomposition import PCA
 import alphashape
 from shapely import affinity
+from shapely.geometry import Polygon
 
 # self defined functions
 import utilities
@@ -21,7 +23,7 @@ def mesh_to_points_cloud(scan_obj):
     scan_obj.compute_vertex_normals()
     scan_pcd = scan_obj.sample_points_uniformly(number_of_points)
     center = scan_pcd.get_center()
-    print(center)
+    # print(center)
     return scan_pcd
 
 
@@ -91,7 +93,7 @@ def change_axis_with_PCA(bone_pcd, show_figure):
     # print('tran_matrix: ', tran_matrix)
 
     bone_after_pca = np.dot(tran_matrix, bone_points.T).T
-    print('bone_after_pca: ', bone_after_pca)
+    # print('bone_after_pca: ', bone_after_pca)
 
     final_pcd = o3d.geometry.PointCloud()
     final_pcd.points = o3d.utility.Vector3dVector(bone_after_pca)
@@ -121,11 +123,26 @@ def get_femur_alpha_shape(points):
     # ax.scatter(points[:, 0], points[:,1])
     # ax.add_patch(PolygonPatch(alpha_shape, alpha=1))
     # plt.show()
+    (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
+    x_length = maxx - minx
+    y_length = maxy - miny
 
-    # todo: head on the left or right
+    # object: put head to right bottom part of the image
+    # head on the left or right
+    left_box = Polygon([(minx, miny), (minx, maxy), (minx + x_length / 10, maxy), (minx + x_length / 10, miny)])
+    left_bone = alpha_shape.intersection(left_box)
+    right_box = Polygon([(maxx - x_length / 10, miny), (maxx - x_length / 10, maxy), (maxx, maxy), (maxx, miny)])
+    right_bone = alpha_shape.intersection(right_box)
+    if left_bone.area < right_bone.area:
+        alpha_shape = affinity.scale(alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
 
-    # todo: head on the upper or lower part
-    alpha_shape = affinity.scale(alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
+    # head on the upper or lower part
+    center_box = Polygon([(minx + x_length * 0.4, miny), (minx + x_length * 0.4, maxy), (maxx + x_length * 0.6, maxy), (maxx + x_length * 0.6, miny)])
+    center_bone = alpha_shape.intersection(center_box)
+
+    if (maxy - center_bone.centroid.y) > y_length / 2:
+        alpha_shape = affinity.scale(alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
+
 
     # alpha_shape.boundary
     # type(alpha_shape.boundary)
@@ -155,7 +172,7 @@ def get_radius_alpha_shape(points):
 
 
 def preprocess_bone(scan_obj, bone_type, show_figure):
-    print('pre-processing bones...')
+    logging.info('pre-processing bones...')
 
     # 1. Scale unit length to 1 mm(coordinate 1000x)
     scan_obj = scale_image(scan_obj)

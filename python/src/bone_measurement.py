@@ -1,5 +1,9 @@
 # python libraries
 import sys
+import os
+from pathlib import Path
+import logging
+from logging import handlers
 import numpy as np
 import math
 import copy
@@ -23,6 +27,10 @@ import image_process
 
 
 # global variants
+# logging file
+_root_dir = Path(os.path.dirname(os.path.abspath(__file__))) / '..'
+_user_logs_file = _root_dir / 'out/logs/user_logs/logs.txt'  # User logging directory.
+
 # switch for figure
 show_figure = True
 
@@ -30,16 +38,34 @@ show_figure = True
 bone_type = 'femur'
 
 
+def init_logger(log_file=_user_logs_file):
+    if not os.path.exists(log_file):
+        os.makedirs(os.path.dirname(log_file))
+
+    log = logging.getLogger('')
+    log.setLevel(logging.INFO)
+    output_format = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    std_out_handler = logging.StreamHandler(sys.stdout)
+    std_out_handler.setFormatter(output_format)
+    logging.getLogger().addHandler(std_out_handler)
+    file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=(1048576*5), backupCount=7)
+    file_handler.setFormatter(output_format)
+    logging.getLogger().addHandler(file_handler)
+
+
 def load_file():
-    print('loading file...')
-    scan_obj = o3d.io.read_triangle_mesh("../../data/femur_half_4.obj")
-    print(scan_obj)
+    logging.info('loading file...')
+    scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_half_4.obj")
+    logging.info(scan_obj)
     if show_figure:
         o3d.visualization.draw_geometries([scan_obj], mesh_show_wireframe=True)
     return scan_obj
 
 
 def main():
+    # 0. Prepare logging file
+    init_logger(_user_logs_file)
+
     # 1. Load file
     scan_obj = load_file()
 
