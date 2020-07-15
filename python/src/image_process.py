@@ -12,8 +12,8 @@ import utilities
 
 
 def scale_image(scan_obj):
+    # Scale unit length from 1m to 1mm (coordinate 1000x)
     points_center = scan_obj.get_center()
-    # print(points_center)
     scan_obj.scale(1000.0, points_center)
     return scan_obj
 
