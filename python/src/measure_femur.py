@@ -212,7 +212,6 @@ def get_fhd(right_bone, right_bone_points_ordered):
     start_y = right_bone_points_ordered[start_idx][1]
     intercept = start_y - start_x
 
-
     # 5. from start_point, find the other point in right bone that on the temp_line
     # line p1: (start_x, start_y), p2:(0, intercept), p3: tmp_point2
 
