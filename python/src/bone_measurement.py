@@ -4,19 +4,7 @@ import os
 from pathlib import Path
 import logging
 from logging import handlers
-import numpy as np
-import math
-import copy
-import matplotlib.pyplot as plt
-from scipy.signal import argrelextrema
-
-from sklearn.decomposition import PCA
-
 import open3d as o3d
-import alphashape
-from descartes import PolygonPatch
-from shapely.geometry import Polygon
-from shapely import affinity
 
 # self defined functions
 import measure_femur
@@ -27,14 +15,12 @@ import image_process
 
 
 # global variants
-# logging file
+# logging file info
 _root_dir = Path(os.path.dirname(os.path.abspath(__file__))) / '..'
 _user_logs_file = _root_dir / 'out/logs/user_logs/logs.txt'  # User logging directory.
-
 # switch for figure
-show_figure = True
-
-# 'femur' / 'tibia' / 'humerus' / 'radius'
+show_figure = False
+# bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
 bone_type = 'femur'
 
 
@@ -54,8 +40,17 @@ def init_logger(log_file=_user_logs_file):
 
 
 def load_file():
-    logging.info('loading file...')
+    logging.info('loading {0} file...'.format(bone_type))
+
+    # default femur
     scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_half_4.obj")
+    if bone_type == 'humerus':
+        scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus_multi_perspective.obj")
+    elif bone_type == 'tibia':
+        scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_multi_perspective.obj")
+    elif bone_type == 'radius':
+        scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_multi_perspective.obj")
+
     logging.info(scan_obj)
     if show_figure:
         o3d.visualization.draw_geometries([scan_obj], mesh_show_wireframe=True)
@@ -78,7 +73,7 @@ def main():
     elif bone_type == 'tibia':
         measure_tibia.get_measurement()
     elif bone_type == 'humerus':
-        measure_humerus.get_measurement()
+        measure_humerus.get_measurement(alpha_shape, show_figure)
     elif bone_type == 'radius':
         measure_radius.get_measurement()
 

@@ -6,6 +6,8 @@ from sklearn.decomposition import PCA
 import alphashape
 from shapely import affinity
 from shapely.geometry import Polygon
+from descartes import PolygonPatch
+from matplotlib import pyplot as plt
 
 # self defined functions
 import utilities
@@ -116,18 +118,20 @@ def three_d_to_two_d(bone_pcd):
     return res
 
 
-def get_femur_alpha_shape(points):
+# both femur and humerus need put head to right-lower corner
+def get_femur_alpha_shape(points, show_figure):
     # todo: a-value
     alpha_shape = alphashape.alphashape(points, 0.4)
-    # fig, ax = plt.subplots()
-    # ax.scatter(points[:, 0], points[:,1])
-    # ax.add_patch(PolygonPatch(alpha_shape, alpha=1))
-    # plt.show()
+    if show_figure:
+        fig, ax = plt.subplots()
+        ax.scatter(points[:, 0], points[:, 1])
+        ax.add_patch(PolygonPatch(alpha_shape, alpha=1))
+        plt.show()
+
     (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
     x_length = maxx - minx
     y_length = maxy - miny
 
-    # object: put head to right bottom part of the image
     # head on the left or right
     left_box = Polygon([(minx, miny), (minx, maxy), (minx + x_length / 10, maxy), (minx + x_length / 10, miny)])
     left_bone = alpha_shape.intersection(left_box)
@@ -143,23 +147,16 @@ def get_femur_alpha_shape(points):
     if (maxy - center_bone.centroid.y) > y_length / 2:
         alpha_shape = affinity.scale(alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
 
-
-    # alpha_shape.boundary
-    # type(alpha_shape.boundary)
-    # alpha_shape.boundary.bounds
-    # line = alpha_shape.exterior
-    # type(line)
-
+    if show_figure:
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax = fig.add_subplot(111)
+        ax.plot(x, y)
+        plt.show()
     return alpha_shape
 
 
 def get_tibia_alpha_shape(points):
-    # todo: a-value
-    alpha_shape = alphashape.alphashape(points, 0.4)
-    return alpha_shape
-
-
-def get_humerus_alpha_shape(points):
     # todo: a-value
     alpha_shape = alphashape.alphashape(points, 0.4)
     return alpha_shape
@@ -197,12 +194,10 @@ def preprocess_bone(scan_obj, bone_type, show_figure):
 
     # 7. Get alpha shape
     alpha_shape = None
-    if bone_type == 'femur':
-        alpha_shape = get_femur_alpha_shape(bone_points)
+    if bone_type == 'femur' or bone_type == 'humerus':
+        alpha_shape = get_femur_alpha_shape(bone_points, show_figure)
     elif bone_type == 'tibia':
         alpha_shape = get_tibia_alpha_shape(bone_points)
-    elif bone_type == 'humerus':
-        alpha_shape = get_humerus_alpha_shape(bone_points)
     elif bone_type == 'radius':
         alpha_shape = get_radius_alpha_shape(bone_points)
 

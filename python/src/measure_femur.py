@@ -1,19 +1,9 @@
 # python libraries
-import sys
 import logging
 import numpy as np
 import math
-import copy
 import matplotlib.pyplot as plt
-from scipy.signal import argrelextrema
-
-from sklearn.decomposition import PCA
-
-import open3d as o3d
-import alphashape
-from descartes import PolygonPatch
 from shapely.geometry import Polygon
-from shapely import affinity
 import numpy.polynomial.polynomial as poly
 
 # self defined functions
@@ -40,9 +30,14 @@ def get_left_part(alpha_shape):
             max_diff_y = diff_cur
             a_idx = i
 
+    diff_last = abs(left_bone_points[len(left_bone_points) - 1][1] - left_bone_points[0][1])
+    if diff_last > max_diff_y:
+        max_diff_y = diff_last
+        a_idx = len(left_bone_points) - 1
+
     # a(-, +), b(-, -)
     # point_a = left_bone_points[a_idx]
-    # point_b = left_bone_points[a_idx + 1]
+    # point_b = left_bone_points[(a_idx + 1) % len(left_bone_points)]
     # start with point_b(right-lower point)
     left_bone_points_ordered = left_bone_points[a_idx + 1:] + left_bone_points[:a_idx + 1]
 
@@ -84,9 +79,14 @@ def get_right_part(alpha_shape):
             max_diff_y = diff_cur
             a_idx = i
 
-    # a(+, +), b(+, +)
-    # point_a = left_bone_points[a_idx]
-    # point_b = left_bone_points[a_idx + 1]
+    diff_last = abs(right_bone_points[len(right_bone_points) - 1][1] - right_bone_points[0][1])
+    if diff_last > max_diff_y:
+        max_diff_y = diff_last
+        a_idx = len(right_bone_points) - 1
+
+    # a(+, -), b(+, +)
+    # point_a = right_bone_points[a_idx]
+    # point_b = right_bone_points[(a_idx + 1) % len(right_bone_points)]
     # start with point_b(left-upper point)
     right_bone_points_ordered = right_bone_points[a_idx + 1:] + right_bone_points[:a_idx + 1]
 
@@ -96,13 +96,13 @@ def get_right_part(alpha_shape):
 def get_fml(alpha_shape):
     (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
     fml = maxx - minx
-    logging.info('fml: {0}'.format(fml))
+    logging.info('fml: {0:0.3f}'.format(fml))
 
 
 def get_feb(left_bone):
     (left_bone_minx, left_bone_miny, left_bone_maxx, left_bone_maxy) = left_bone.exterior.bounds
     feb = left_bone_maxy - left_bone_miny
-    logging.info('feb: {0}'.format(feb))
+    logging.info('feb: {0:0.3f}'.format(feb))
 
 
 def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
@@ -143,7 +143,7 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
     for i in range(len(right_bone_points_ordered)):
         fbml = max(fbml, utilities.distance_point_to_line(p_left, p_left_second, right_bone_points_ordered[i]))
 
-    logging.info('fbml: {0}'.format(fbml))
+    logging.info('fbml: {0:0.3f}'.format(fbml))
 
 
 def get_fmld(center_bone_points, show_figure):
@@ -188,7 +188,7 @@ def get_fmld(center_bone_points, show_figure):
         min_line_segment_length = min(dis_cur, min_line_segment_length)
 
     fmld = math.sqrt(min_line_segment_length)
-    logging.info('fmld: {0}'.format(fmld))
+    logging.info('fmld: {0:0.3f}'.format(fmld))
 
 
 def get_fhd(right_bone, right_bone_points_ordered):
@@ -288,7 +288,7 @@ def get_fhd(right_bone, right_bone_points_ordered):
             count_decrease = 0
         iterate_idx -= 1
 
-    logging.info('fhd: {0}'.format(fhd))
+    logging.info('fhd: {0:0.3f}'.format(fhd))
 
 
 def get_measurement(alpha_shape, show_figure):
