@@ -19,9 +19,9 @@ import image_process
 _root_dir = Path(os.path.dirname(os.path.abspath(__file__))) / '..'
 _user_logs_file = _root_dir / 'out/logs/user_logs/logs.txt'  # User logging directory.
 # switch for figure
-show_figure = False
+show_figure = True
 # bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
-bone_type = 'femur'
+bone_type = 'tibia'
 
 
 def init_logger(log_file=_user_logs_file):
@@ -71,7 +71,7 @@ def main():
     if bone_type == 'femur':
         measure_femur.get_measurement(alpha_shape, show_figure)
     elif bone_type == 'tibia':
-        measure_tibia.get_measurement()
+        measure_tibia.get_measurement(alpha_shape)
     elif bone_type == 'humerus':
         measure_humerus.get_measurement(alpha_shape, show_figure)
     elif bone_type == 'radius':

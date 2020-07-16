@@ -156,9 +156,14 @@ def get_femur_alpha_shape(points, show_figure):
     return alpha_shape
 
 
-def get_tibia_alpha_shape(points):
+def get_tibia_alpha_shape(points, show_figure):
     # todo: a-value
     alpha_shape = alphashape.alphashape(points, 0.4)
+    if show_figure:
+        fig, ax = plt.subplots()
+        ax.scatter(points[:, 0], points[:, 1])
+        ax.add_patch(PolygonPatch(alpha_shape, alpha=1))
+        plt.show()
     return alpha_shape
 
 
@@ -197,7 +202,7 @@ def preprocess_bone(scan_obj, bone_type, show_figure):
     if bone_type == 'femur' or bone_type == 'humerus':
         alpha_shape = get_femur_alpha_shape(bone_points, show_figure)
     elif bone_type == 'tibia':
-        alpha_shape = get_tibia_alpha_shape(bone_points)
+        alpha_shape = get_tibia_alpha_shape(bone_points, show_figure)
     elif bone_type == 'radius':
         alpha_shape = get_radius_alpha_shape(bone_points)
 
