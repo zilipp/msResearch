@@ -3,73 +3,8 @@ import logging
 from shapely.geometry import Polygon
 
 # self defined functions
-import utilities
-
-
-def get_left_part(alpha_shape):
-    (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
-    # todo: coefficient
-    left_box = Polygon([(minx, miny), (minx, maxy), (minx / 1.5, maxy), (minx / 1.5, miny)])
-    left_bone = alpha_shape.intersection(left_box)
-
-    left_bone_line = left_bone.exterior
-    left_bone_points = []
-    for x, y in left_bone_line.coords:
-        left_bone_points.append([x, y])
-    left_bone_points = left_bone_points[:-1]
-
-    max_diff_y = 0
-    a_idx = 0
-    for i in range(len(left_bone_points) - 1):
-        diff_cur = abs(left_bone_points[i][1] - left_bone_points[i + 1][1])
-        if diff_cur > max_diff_y:
-            max_diff_y = diff_cur
-            a_idx = i
-
-    diff_last = abs(left_bone_points[len(left_bone_points) - 1][1] - left_bone_points[0][1])
-    if diff_last > max_diff_y:
-        max_diff_y = diff_last
-        a_idx = len(left_bone_points) - 1
-
-    # a(-, +), b(-, -)
-    # point_a = left_bone_points[a_idx]
-    # point_b = left_bone_points[(a_idx + 1) % len(left_bone_points)]
-    # start with point_b(right-lower point)
-    left_bone_points_ordered = left_bone_points[a_idx + 1:] + left_bone_points[:a_idx + 1]
-
-    return left_bone, left_bone_points_ordered
-
-
-def get_right_part(alpha_shape):
-    (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
-    # todo: coefficient
-    right_box = Polygon([(maxx / 1.5, miny), (maxx / 1.5, maxy), (maxx, maxy), (maxx, miny)])
-    right_bone = alpha_shape.intersection(right_box)
-
-    right_bone_line = right_bone.exterior
-    right_bone_points = []
-    for x, y in right_bone_line.coords:
-        right_bone_points.append([x, y])
-    right_bone_points = right_bone_points[:-1]
-
-    max_diff_y = 0
-    a_idx = 0
-    for i in range(len(right_bone_points) - 1):
-        diff_cur = abs(right_bone_points[i][1] - right_bone_points[i + 1][1])
-        if diff_cur > max_diff_y:
-            max_diff_y = diff_cur
-            a_idx = i
-
-    diff_last = abs(right_bone_points[len(right_bone_points) - 1][1] - right_bone_points[0][1])
-    if diff_last > max_diff_y:
-        a_idx = len(right_bone_points) - 1
-
-    # a(+, -), b(+, +)
-    # point_a = right_bone_points[a_idx]
-    # point_b = right_bone_points[(a_idx + 1) % len(right_bone_points)]
-    # start with point_b(left-upper point)
-    right_bone_points_ordered = right_bone_points[a_idx + 1:] + right_bone_points[:a_idx + 1]
-    return right_bone, right_bone_points_ordered
+from utilities import distance_util
+from utilities import bone_region_util
 
 
 def get_hml(alpha_shape):
@@ -123,8 +58,8 @@ def get_hhd(right_bone, right_bone_points_ordered):
     line_right_point = [right_bone_points_ordered[end_idx - 2][0], right_bone_points_ordered[end_idx - 2][1]]
     line_left_point = [right_bone_points_ordered[end_idx - 1][0], right_bone_points_ordered[end_idx - 1][1]]
 
-    dis_right_point = utilities.distance_point_to_line(p_start, p_y_inter, line_right_point)
-    dis_left_point = utilities.distance_point_to_line(p_start, p_y_inter, line_left_point)
+    dis_right_point = distance_util.distance_point_to_line(p_start, p_y_inter, line_right_point)
+    dis_left_point = distance_util.distance_point_to_line(p_start, p_y_inter, line_left_point)
 
     p_start_2 = line_left_point
     p_start_2_idx = end_idx - 1
@@ -136,7 +71,7 @@ def get_hhd(right_bone, right_bone_points_ordered):
 
     # 6. 计算出点tmp_point2到 tmp_line上的投影点tmp_point3 然后算出来 start_point到tmp_point3的距离dist
     # 把dist存入一个list
-    hhd = utilities.distance_point_to_point(p_start, p_start_2)
+    hhd = distance_util.distance_point_to_point(p_start, p_start_2)
     count_decrease = 0
 
     # 7. start_point开始，向上遍历点 tmp_point1， 更新tmp_line   tmp_point1_y = tmp1_point_x+b
@@ -146,20 +81,20 @@ def get_hhd(right_bone, right_bone_points_ordered):
 
     def find_down_left(p1, from_idx, right_bone_points_ordered_array):
         cur_intercept = p1[1] - p1[0]
-        right_side = True
-        while right_side and from_idx < len(right_bone_points_ordered_array):
+        at_right_side = True
+        while at_right_side and from_idx < len(right_bone_points_ordered_array):
             candidate_x = right_bone_points_ordered_array[from_idx][0]
             candidate_y = right_bone_points_ordered_array[from_idx][1]
             if candidate_x + cur_intercept <= candidate_y:
-                right_side = False
+                at_right_side = False
             from_idx += 1
 
         if from_idx == len(right_bone_points_ordered_array):
             return None
         left_idx = from_idx - 1
         right_idx = left_idx - 1
-        left_dis = utilities.distance_point_to_line(p1, [0, cur_intercept], right_bone_points_ordered_array[left_idx])
-        right_dis = utilities.distance_point_to_line(p1, [0, cur_intercept], right_bone_points_ordered_array[right_idx])
+        left_dis = distance_util.distance_point_to_line(p1, [0, cur_intercept], right_bone_points_ordered_array[left_idx])
+        right_dis = distance_util.distance_point_to_line(p1, [0, cur_intercept], right_bone_points_ordered_array[right_idx])
 
         res_point = right_bone_points_ordered_array[left_idx]
         if left_dis > right_dis:
@@ -174,7 +109,7 @@ def get_hhd(right_bone, right_bone_points_ordered):
         if p_down_left is None:
             break
 
-        cur_fhd = utilities.distance_point_to_point(p_up_right, p_down_left)
+        cur_fhd = distance_util.distance_point_to_point(p_up_right, p_down_left)
         hhd = max(hhd, cur_fhd)
         if cur_fhd < hhd:
             count_decrease += 1
@@ -186,12 +121,13 @@ def get_hhd(right_bone, right_bone_points_ordered):
     logging.info('hhd: {0:0.3f}'.format(hhd))
 
 
-def get_measurement(alpha_shape, show_figure):
+def get_measurement(alpha_shape):
     logging.info('Start measuring humerus...')
 
-    left_bone, left_bone_points_ordered = get_left_part(alpha_shape)
-    right_bone, right_bone_points_ordered = get_right_part(alpha_shape)
+    left_region, _ = bone_region_util.get_left_region(alpha_shape)
+    right_region, right_region_points_ordered = bone_region_util.get_right_region(alpha_shape)
 
     get_hml(alpha_shape)
-    get_heb(left_bone)
-    get_hhd(right_bone, right_bone_points_ordered)
+    get_heb(left_region)
+    get_hhd(right_region, right_region_points_ordered)
+

@@ -10,7 +10,8 @@ from descartes import PolygonPatch
 from matplotlib import pyplot as plt
 
 # self defined functions
-import utilities
+from utilities import distance_util
+from utilities import visualization_util
 
 
 def scale_image(scan_obj):
@@ -51,7 +52,7 @@ def remove_noise_points(bone_cloud, show_figure):
                                                     std_ratio=0.5)
     # display outliers
     if show_figure:
-        utilities.display_inlier_outlier(bone_cloud, ind)
+        visualization_util.display_inlier_outlier(bone_cloud, ind)
 
     bone_cloud = bone_cloud.select_by_index(ind)
     return bone_cloud
@@ -65,7 +66,7 @@ def project_points_to_plane(bone_cloud, plane, show_figure):
     projected_bone_points = []
     for i in range(bone_points.shape[0]):
         point = bone_points[i]
-        projected_bone_points.append(utilities.point_to_plane(point, plane))
+        projected_bone_points.append(distance_util.point_to_plane(point, plane))
 
     bone_points = np.array(projected_bone_points)
 
@@ -73,7 +74,7 @@ def project_points_to_plane(bone_cloud, plane, show_figure):
     bone_pcd.points = o3d.utility.Vector3dVector(bone_points)
 
     if show_figure:
-        o3d.visualization.draw_geometries([bone_pcd, utilities.get_visualization_axis()])
+        o3d.visualization.draw_geometries([bone_pcd, visualization_util.get_visualization_axis()])
     return bone_pcd
 
 
@@ -100,7 +101,7 @@ def change_axis_with_PCA(bone_pcd, show_figure):
     final_pcd = o3d.geometry.PointCloud()
     final_pcd.points = o3d.utility.Vector3dVector(bone_after_pca)
     if show_figure:
-        o3d.visualization.draw_geometries([final_pcd, utilities.get_visualization_axis()])
+        o3d.visualization.draw_geometries([final_pcd, visualization_util.get_visualization_axis()])
 
     return final_pcd
 
@@ -118,8 +119,7 @@ def three_d_to_two_d(bone_pcd):
     return res
 
 
-# both femur and humerus need put head to right-lower corner
-def get_femur_alpha_shape(points, show_figure):
+def get_alpha_shape(points, bone_type, show_figure):
     # todo: a-value
     alpha_shape = alphashape.alphashape(points, 0.4)
     if show_figure:
@@ -128,6 +128,10 @@ def get_femur_alpha_shape(points, show_figure):
         ax.add_patch(PolygonPatch(alpha_shape, alpha=1))
         plt.show()
 
+    if bone_type == 'tibia' or bone_type == 'radius':
+        return alpha_shape
+
+    # both femur and humerus need put head to right-lower corner
     (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
     x_length = maxx - minx
     y_length = maxy - miny
@@ -156,23 +160,6 @@ def get_femur_alpha_shape(points, show_figure):
     return alpha_shape
 
 
-def get_tibia_alpha_shape(points, show_figure):
-    # todo: a-value
-    alpha_shape = alphashape.alphashape(points, 0.4)
-    if show_figure:
-        fig, ax = plt.subplots()
-        ax.scatter(points[:, 0], points[:, 1])
-        ax.add_patch(PolygonPatch(alpha_shape, alpha=1))
-        plt.show()
-    return alpha_shape
-
-
-def get_radius_alpha_shape(points):
-    # todo: a-value
-    alpha_shape = alphashape.alphashape(points, 0.4)
-    return alpha_shape
-
-
 def preprocess_bone(scan_obj, bone_type, show_figure):
     logging.info('pre-processing bones...')
 
@@ -198,13 +185,7 @@ def preprocess_bone(scan_obj, bone_type, show_figure):
     bone_points = three_d_to_two_d(bone_pcd)
 
     # 7. Get alpha shape
-    alpha_shape = None
-    if bone_type == 'femur' or bone_type == 'humerus':
-        alpha_shape = get_femur_alpha_shape(bone_points, show_figure)
-    elif bone_type == 'tibia':
-        alpha_shape = get_tibia_alpha_shape(bone_points, show_figure)
-    elif bone_type == 'radius':
-        alpha_shape = get_radius_alpha_shape(bone_points)
+    alpha_shape = get_alpha_shape(bone_points, bone_type, show_figure)
 
     # # 8. Save file
     # if bone_type == 'femur':
