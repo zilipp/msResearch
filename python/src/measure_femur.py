@@ -11,32 +11,32 @@ from utilities import bone_region_util
 
 
 def get_fml(alpha_shape):
-    (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
-    fml = maxx - minx
+    (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
+    fml = max_x - min_x
     logging.info('fml: {0:0.3f}'.format(fml))
 
 
 def get_feb(left_bone):
-    (left_bone_minx, left_bone_miny, left_bone_maxx, left_bone_maxy) = left_bone.exterior.bounds
-    feb = left_bone_maxy - left_bone_miny
+    (left_bone_min_x, left_bone_min_y, left_bone_max_x, left_bone_max_y) = left_bone.exterior.bounds
+    feb = left_bone_max_y - left_bone_min_y
     logging.info('feb: {0:0.3f}'.format(feb))
 
 
 def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
-    (left_bone_minx, left_bone_miny, left_bone_maxx, left_bone_maxy) = left_bone.exterior.bounds
+    (left_bone_min_x, left_bone_min_y, left_bone_max_x, left_bone_max_y) = left_bone.exterior.bounds
 
     # most left point, 1st POIs
     p_left = []
     p_left_idx = 0
     for i in range(len(left_bone_points_ordered)):
-        if left_bone_points_ordered[i][0] == left_bone_minx:
+        if left_bone_points_ordered[i][0] == left_bone_min_x:
             p_left = left_bone_points_ordered[i]
             p_left_idx = i
             break
     # print(p_left, 'at: ', p_left_idx)
 
     # if ist POI is above x-axis, change the direction of line
-    if left_bone_maxy - p_left[1] < (left_bone_maxy - left_bone_miny) * 0.5:
+    if left_bone_max_y - p_left[1] < (left_bone_max_y - left_bone_min_y) * 0.5:
         left_bone_points_ordered.reverse()
         p_left_idx = len(left_bone_points_ordered) - 1 - p_left_idx
 

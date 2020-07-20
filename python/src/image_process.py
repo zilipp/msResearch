@@ -132,23 +132,23 @@ def get_alpha_shape(points, bone_type, show_figure):
         return alpha_shape
 
     # both femur and humerus need put head to right-lower corner
-    (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
-    x_length = maxx - minx
-    y_length = maxy - miny
+    (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
+    x_length = max_x - min_x
+    y_length = max_y - min_y
 
     # head on the left or right
-    left_box = Polygon([(minx, miny), (minx, maxy), (minx + x_length / 10, maxy), (minx + x_length / 10, miny)])
+    left_box = Polygon([(min_x, min_y), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y)])
     left_bone = alpha_shape.intersection(left_box)
-    right_box = Polygon([(maxx - x_length / 10, miny), (maxx - x_length / 10, maxy), (maxx, maxy), (maxx, miny)])
+    right_box = Polygon([(max_x - x_length / 10, min_y), (max_x - x_length / 10, max_y), (max_x, max_y), (max_x, min_y)])
     right_bone = alpha_shape.intersection(right_box)
     if left_bone.area < right_bone.area:
         alpha_shape = affinity.scale(alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
 
     # head on the upper or lower part
-    center_box = Polygon([(minx + x_length * 0.4, miny), (minx + x_length * 0.4, maxy), (maxx + x_length * 0.6, maxy), (maxx + x_length * 0.6, miny)])
+    center_box = Polygon([(min_x + x_length * 0.4, min_y), (min_x + x_length * 0.4, max_y), (max_x + x_length * 0.6, max_y), (max_x + x_length * 0.6, min_y)])
     center_bone = alpha_shape.intersection(center_box)
 
-    if (maxy - center_bone.centroid.y) > y_length / 2:
+    if (max_y - center_bone.centroid.y) > y_length / 2:
         alpha_shape = affinity.scale(alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
 
     if show_figure:

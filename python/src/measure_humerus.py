@@ -8,14 +8,14 @@ from utilities import bone_region_util
 
 
 def get_hml(alpha_shape):
-    (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
-    hml = maxx - minx
+    (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
+    hml = max_x - min_x
     logging.info('hml: {0:0.3f}'.format(hml))
 
 
 def get_heb(left_bone):
-    (left_bone_minx, left_bone_miny, left_bone_maxx, left_bone_maxy) = left_bone.exterior.bounds
-    heb = left_bone_maxy - left_bone_miny
+    (left_bone_min_x, left_bone_min_y, left_bone_max_x, left_bone_max_y) = left_bone.exterior.bounds
+    heb = left_bone_max_y - left_bone_min_y
     logging.info('heb: {0:0.3f}'.format(heb))
 
 
@@ -23,11 +23,11 @@ def get_hhd(right_bone, right_bone_points_ordered):
     # 1. right_bone_points_ordered: start from left-upper point
 
     # 2. point with most right s-coorinate: max(x)
-    (right_bone_minx, right_bone_miny, right_bone_maxx, right_bone_maxy) = right_bone.exterior.bounds
+    (right_bone_min_x, right_bone_min_y, right_bone_max_x, right_bone_max_y) = right_bone.exterior.bounds
 
     right_most_idx = 0
     for i in range(len(right_bone_points_ordered)):
-        if right_bone_points_ordered[i][0] == right_bone_maxx:
+        if right_bone_points_ordered[i][0] == right_bone_max_x:
             right_most_idx = i
             break
 
