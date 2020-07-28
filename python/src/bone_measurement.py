@@ -4,19 +4,7 @@ import os
 from pathlib import Path
 import logging
 from logging import handlers
-import numpy as np
-import math
-import copy
-import matplotlib.pyplot as plt
-from scipy.signal import argrelextrema
-
-from sklearn.decomposition import PCA
-
 import open3d as o3d
-import alphashape
-from descartes import PolygonPatch
-from shapely.geometry import Polygon
-from shapely import affinity
 
 # self defined functions
 import measure_femur
@@ -27,15 +15,15 @@ import image_process
 
 
 # global variants
-# logging file
+# logging file info
 _root_dir = Path(os.path.dirname(os.path.abspath(__file__))) / '..'
 _user_logs_file = _root_dir / 'out/logs/user_logs/logs.txt'  # User logging directory.
-
+# process more files
+multi_files = False
 # switch for figure
-show_figure = True
-
-# 'femur' / 'tibia' / 'humerus' / 'radius'
-bone_type = 'femur'
+show_figure = False
+# bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
+bone_type = 'radius'
 
 
 def init_logger(log_file=_user_logs_file):
@@ -53,9 +41,24 @@ def init_logger(log_file=_user_logs_file):
     logging.getLogger().addHandler(file_handler)
 
 
-def load_file():
-    logging.info('loading file...')
-    scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_half_4.obj")
+def load_file(index=2):
+    logging.info('loading {0} file...'.format(bone_type))
+    scan_obj = None
+    if bone_type == 'femur':
+        # scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_0.obj")
+        scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_" + str(index) + ".obj")
+    elif bone_type == 'humerus':
+        # scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus_0.obj")
+        scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus_1.obj")
+    elif bone_type == 'tibia':
+        # scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_0.obj")
+        scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_1.obj")
+    elif bone_type == 'radius':
+        # scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_0.obj")
+        scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_" + str(index) + ".obj")
+    else:
+        logging.error('load_file(): BoneType is not defined')
+
     logging.info(scan_obj)
     if show_figure:
         o3d.visualization.draw_geometries([scan_obj], mesh_show_wireframe=True)
@@ -76,12 +79,38 @@ def main():
     if bone_type == 'femur':
         measure_femur.get_measurement(alpha_shape, show_figure)
     elif bone_type == 'tibia':
-        measure_tibia.get_measurement()
+        measure_tibia.get_measurement(alpha_shape)
     elif bone_type == 'humerus':
-        measure_humerus.get_measurement()
+        measure_humerus.get_measurement(alpha_shape)
     elif bone_type == 'radius':
-        measure_radius.get_measurement()
+        measure_radius.get_measurement(alpha_shape, show_figure)
+
+
+def multi_main():
+    # 0. Prepare logging file
+    init_logger(_user_logs_file)
+
+    for i in range(9):
+        # 1. Load file
+        scan_obj = load_file(i)
+
+        # 2. 3D model pre-processing
+        alpha_shape = image_process.preprocess_bone(scan_obj, bone_type, show_figure)
+
+        # 3 Measurements
+        if bone_type == 'femur':
+            measure_femur.get_measurement(alpha_shape, show_figure)
+        elif bone_type == 'tibia':
+            measure_tibia.get_measurement(alpha_shape)
+        elif bone_type == 'humerus':
+            measure_humerus.get_measurement(alpha_shape)
+        elif bone_type == 'radius':
+            measure_radius.get_measurement(alpha_shape, show_figure)
 
 
 if __name__ == "__main__":
-    main()
+    if multi_files:
+        multi_main()
+    else:
+        main()
+

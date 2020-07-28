@@ -4,11 +4,27 @@ import numpy as np
 import open3d as o3d
 from sklearn.decomposition import PCA
 import alphashape
+import shapely
 from shapely import affinity
 from shapely.geometry import Polygon
+from descartes import PolygonPatch
+from matplotlib import pyplot as plt
 
 # self defined functions
-import utilities
+from utilities import distance_util
+from utilities import visualization_util
+
+# params for remove background
+distance_threshold_femur = 3
+distance_threshold_radius = 3
+ransac_n = 3
+num_iterations = 1000
+
+nb_neighbors_femur = 20
+nb_neighbors_radius = 20
+
+std_ratio_femur = 0.5
+std_ratio_radius = 2
 
 
 def scale_image(scan_obj):
@@ -22,16 +38,20 @@ def mesh_to_points_cloud(scan_obj):
     number_of_points = np.asarray(scan_obj.vertices).shape[0]
     scan_obj.compute_vertex_normals()
     scan_pcd = scan_obj.sample_points_uniformly(number_of_points)
-    center = scan_pcd.get_center()
-    # print(center)
     return scan_pcd
 
 
-def remove_background(scan_pcd):
+def remove_background(scan_pcd, bone_type):
     # find plane using RANSAC: plane function: ax + by + cz + d = 0
-    plane_model, inliers = scan_pcd.segment_plane(distance_threshold=2,
-                                                  ransac_n=3,
-                                                  num_iterations=1000)
+    plane_model, inliers = None, None
+    if bone_type == 'femur':
+        plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_femur,
+                                                      ransac_n=ransac_n,
+                                                      num_iterations=num_iterations)
+    elif bone_type == 'radius':
+        plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_radius,
+                                                      ransac_n=ransac_n,
+                                                      num_iterations=num_iterations)
     plane = plane_model
     # print(f"Plane equation: {plane[0]:.5f}x + {plane[1]:.5f}y + {plane[2]:.5f}z + {plane[3]:.5f} = 0")
 
@@ -44,12 +64,19 @@ def remove_background(scan_pcd):
     return bone_cloud, plane
 
 
-def remove_noise_points(bone_cloud, show_figure):
-    cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=30,
-                                                    std_ratio=0.5)
+def remove_noise_points(bone_cloud, bone_type, show_figure):
+    cl, ind = None, None
+    if bone_type != 'radius':
+        cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_femur,
+                                                        std_ratio=std_ratio_femur)
+        # cl, ind = bone_cloud.remove_radius_outlier(nb_points=10, radius=5)
+    elif bone_type == 'radius':
+        cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_radius,
+                                                        std_ratio=std_ratio_radius)
+
     # display outliers
     if show_figure:
-        utilities.display_inlier_outlier(bone_cloud, ind)
+        visualization_util.display_inlier_outlier(bone_cloud, ind)
 
     bone_cloud = bone_cloud.select_by_index(ind)
     return bone_cloud
@@ -63,7 +90,7 @@ def project_points_to_plane(bone_cloud, plane, show_figure):
     projected_bone_points = []
     for i in range(bone_points.shape[0]):
         point = bone_points[i]
-        projected_bone_points.append(utilities.point_to_plane(point, plane))
+        projected_bone_points.append(distance_util.point_to_plane(point, plane))
 
     bone_points = np.array(projected_bone_points)
 
@@ -71,7 +98,7 @@ def project_points_to_plane(bone_cloud, plane, show_figure):
     bone_pcd.points = o3d.utility.Vector3dVector(bone_points)
 
     if show_figure:
-        o3d.visualization.draw_geometries([bone_pcd, utilities.get_visualization_axis()])
+        o3d.visualization.draw_geometries([bone_pcd, visualization_util.get_visualization_axis()])
     return bone_pcd
 
 
@@ -98,7 +125,7 @@ def change_axis_with_PCA(bone_pcd, show_figure):
     final_pcd = o3d.geometry.PointCloud()
     final_pcd.points = o3d.utility.Vector3dVector(bone_after_pca)
     if show_figure:
-        o3d.visualization.draw_geometries([final_pcd, utilities.get_visualization_axis()])
+        o3d.visualization.draw_geometries([final_pcd, visualization_util.get_visualization_axis()])
 
     return final_pcd
 
@@ -116,58 +143,55 @@ def three_d_to_two_d(bone_pcd):
     return res
 
 
-def get_femur_alpha_shape(points):
+def get_alpha_shape(points, bone_type, show_figure):
     # todo: a-value
     alpha_shape = alphashape.alphashape(points, 0.4)
-    # fig, ax = plt.subplots()
-    # ax.scatter(points[:, 0], points[:,1])
-    # ax.add_patch(PolygonPatch(alpha_shape, alpha=1))
-    # plt.show()
-    (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
-    x_length = maxx - minx
-    y_length = maxy - miny
 
-    # object: put head to right bottom part of the image
+    if show_figure:
+        alpha_shape_pts = alpha_shape.exterior.coords.xy
+        fig, ax = plt.subplots()
+        ax.scatter(alpha_shape_pts[0], alpha_shape_pts[1], color='red')
+        ax.add_patch(PolygonPatch(alpha_shape, fill=False, color='green'))
+        ax.set_aspect('equal')
+        plt.show()
+
+    if alpha_shape.geom_type == 'MultiPolygon':
+        areas = [i.area for i in alpha_shape]
+        # Get the area of the largest part
+        max_area = areas.index(max(areas))
+        # Return the index of the largest area
+        alpha_shape = alpha_shape[max_area]
+
+    if bone_type == 'tibia' or bone_type == 'radius':
+        return alpha_shape
+
+    # both femur and humerus need put head to right-lower corner
+    (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
+    x_length = max_x - min_x
+    y_length = max_y - min_y
+
     # head on the left or right
-    left_box = Polygon([(minx, miny), (minx, maxy), (minx + x_length / 10, maxy), (minx + x_length / 10, miny)])
+    left_box = Polygon([(min_x, min_y), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y)])
     left_bone = alpha_shape.intersection(left_box)
-    right_box = Polygon([(maxx - x_length / 10, miny), (maxx - x_length / 10, maxy), (maxx, maxy), (maxx, miny)])
+    right_box = Polygon([(max_x - x_length / 10, min_y), (max_x - x_length / 10, max_y), (max_x, max_y), (max_x, min_y)])
     right_bone = alpha_shape.intersection(right_box)
     if left_bone.area < right_bone.area:
         alpha_shape = affinity.scale(alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
 
     # head on the upper or lower part
-    center_box = Polygon([(minx + x_length * 0.4, miny), (minx + x_length * 0.4, maxy), (maxx + x_length * 0.6, maxy), (maxx + x_length * 0.6, miny)])
+    center_box = Polygon([(min_x + x_length * 0.4, min_y), (min_x + x_length * 0.4, max_y), (max_x + x_length * 0.6, max_y), (max_x + x_length * 0.6, min_y)])
     center_bone = alpha_shape.intersection(center_box)
 
-    if (maxy - center_bone.centroid.y) > y_length / 2:
+    if (max_y - center_bone.centroid.y) > y_length / 2:
         alpha_shape = affinity.scale(alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
 
-
-    # alpha_shape.boundary
-    # type(alpha_shape.boundary)
-    # alpha_shape.boundary.bounds
-    # line = alpha_shape.exterior
-    # type(line)
-
-    return alpha_shape
-
-
-def get_tibia_alpha_shape(points):
-    # todo: a-value
-    alpha_shape = alphashape.alphashape(points, 0.4)
-    return alpha_shape
-
-
-def get_humerus_alpha_shape(points):
-    # todo: a-value
-    alpha_shape = alphashape.alphashape(points, 0.4)
-    return alpha_shape
-
-
-def get_radius_alpha_shape(points):
-    # todo: a-value
-    alpha_shape = alphashape.alphashape(points, 0.4)
+    if show_figure:
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax = fig.add_subplot(111)
+        ax.plot(x, y)
+        ax.set_aspect('equal')
+        plt.show()
     return alpha_shape
 
 
@@ -181,10 +205,10 @@ def preprocess_bone(scan_obj, bone_type, show_figure):
     scan_pcd = mesh_to_points_cloud(scan_obj)
 
     # 3. Remove background
-    bone_cloud, plane = remove_background(scan_pcd)
+    bone_cloud, plane = remove_background(scan_pcd, bone_type)
 
     # 4. Remove noise points
-    bone_cloud = remove_noise_points(bone_cloud, show_figure)
+    bone_cloud = remove_noise_points(bone_cloud, bone_type, show_figure)
 
     # 5. Project points to plane
     bone_pcd = project_points_to_plane(bone_cloud, plane, show_figure)
@@ -196,15 +220,7 @@ def preprocess_bone(scan_obj, bone_type, show_figure):
     bone_points = three_d_to_two_d(bone_pcd)
 
     # 7. Get alpha shape
-    alpha_shape = None
-    if bone_type == 'femur':
-        alpha_shape = get_femur_alpha_shape(bone_points)
-    elif bone_type == 'tibia':
-        alpha_shape = get_tibia_alpha_shape(bone_points)
-    elif bone_type == 'humerus':
-        alpha_shape = get_humerus_alpha_shape(bone_points)
-    elif bone_type == 'radius':
-        alpha_shape = get_radius_alpha_shape(bone_points)
+    alpha_shape = get_alpha_shape(bone_points, bone_type, show_figure)
 
     # # 8. Save file
     # if bone_type == 'femur':
