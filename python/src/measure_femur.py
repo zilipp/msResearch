@@ -65,8 +65,12 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
 
 def get_fmld(center_bone_points, show_figure):
     center_bone_points = np.asarray(center_bone_points)
+    # sort upper and lower points in order by x-value
     center_bone_points_upper = np.asarray([x for x in center_bone_points if x[1] >= 0])
+    center_bone_points_upper = center_bone_points_upper[np.argsort(center_bone_points_upper[:, 0])]
+
     center_bone_points_lower = np.asarray([x for x in center_bone_points if x[1] <= 0])
+    center_bone_points_lower = center_bone_points_lower[np.argsort(center_bone_points_lower[:, 0])]
 
     # fit two lines
     top_line_p = distance_util.fit_line(center_bone_points_upper, show_figure)

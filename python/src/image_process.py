@@ -4,6 +4,7 @@ import numpy as np
 import open3d as o3d
 from sklearn.decomposition import PCA
 import alphashape
+import shapely
 from shapely import affinity
 from shapely.geometry import Polygon
 from descartes import PolygonPatch
@@ -12,6 +13,13 @@ from matplotlib import pyplot as plt
 # self defined functions
 from utilities import distance_util
 from utilities import visualization_util
+
+
+nb_neighbors_femur = 20
+nb_neighbors_radius = 20
+
+std_ratio_femur = 0.5
+std_ratio_radius = 2
 
 
 def scale_image(scan_obj):
@@ -25,14 +33,12 @@ def mesh_to_points_cloud(scan_obj):
     number_of_points = np.asarray(scan_obj.vertices).shape[0]
     scan_obj.compute_vertex_normals()
     scan_pcd = scan_obj.sample_points_uniformly(number_of_points)
-    center = scan_pcd.get_center()
-    # print(center)
     return scan_pcd
 
 
 def remove_background(scan_pcd):
     # find plane using RANSAC: plane function: ax + by + cz + d = 0
-    plane_model, inliers = scan_pcd.segment_plane(distance_threshold=2,
+    plane_model, inliers = scan_pcd.segment_plane(distance_threshold=3,
                                                   ransac_n=3,
                                                   num_iterations=1000)
     plane = plane_model
@@ -47,9 +53,16 @@ def remove_background(scan_pcd):
     return bone_cloud, plane
 
 
-def remove_noise_points(bone_cloud, show_figure):
-    cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=30,
-                                                    std_ratio=0.5)
+def remove_noise_points(bone_cloud, bone_type, show_figure):
+    cl, ind = None, None
+    if bone_type != 'radius':
+        cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_femur,
+                                                        std_ratio=std_ratio_femur)
+        # cl, ind = bone_cloud.remove_radius_outlier(nb_points=10, radius=5)
+    elif bone_type == 'radius':
+        cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_radius,
+                                                        std_ratio=std_ratio_radius)
+
     # display outliers
     if show_figure:
         visualization_util.display_inlier_outlier(bone_cloud, ind)
@@ -122,11 +135,21 @@ def three_d_to_two_d(bone_pcd):
 def get_alpha_shape(points, bone_type, show_figure):
     # todo: a-value
     alpha_shape = alphashape.alphashape(points, 0.4)
+
     if show_figure:
+        alpha_shape_pts = alpha_shape.exterior.coords.xy
         fig, ax = plt.subplots()
-        ax.scatter(points[:, 0], points[:, 1])
-        ax.add_patch(PolygonPatch(alpha_shape, alpha=1))
+        ax.scatter(alpha_shape_pts[0], alpha_shape_pts[1], color='red')
+        ax.add_patch(PolygonPatch(alpha_shape, fill=False, color='green'))
+        ax.set_aspect('equal')
         plt.show()
+
+    if alpha_shape.geom_type == 'MultiPolygon':
+        areas = [i.area for i in alpha_shape]
+        # Get the area of the largest part
+        max_area = areas.index(max(areas))
+        # Return the index of the largest area
+        alpha_shape = alpha_shape[max_area]
 
     if bone_type == 'tibia' or bone_type == 'radius':
         return alpha_shape
@@ -156,6 +179,7 @@ def get_alpha_shape(points, bone_type, show_figure):
         x, y = alpha_shape.exterior.xy
         ax = fig.add_subplot(111)
         ax.plot(x, y)
+        ax.set_aspect('equal')
         plt.show()
     return alpha_shape
 
@@ -173,7 +197,7 @@ def preprocess_bone(scan_obj, bone_type, show_figure):
     bone_cloud, plane = remove_background(scan_pcd)
 
     # 4. Remove noise points
-    bone_cloud = remove_noise_points(bone_cloud, show_figure)
+    bone_cloud = remove_noise_points(bone_cloud, bone_type, show_figure)
 
     # 5. Project points to plane
     bone_pcd = project_points_to_plane(bone_cloud, plane, show_figure)

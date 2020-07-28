@@ -13,6 +13,7 @@ def get_visualization_axis():
                  [0, 2],  # x-axis
                  [0, 3]]  # y-axis
 
+    # z: magenta, y: black, x: black
     colors = [[1, 0, 1], [0, 0, 0], [0, 0, 0]]
     aix_line_set = o3d.geometry.LineSet(points=o3d.utility.Vector3dVector(aix_points),
                                         lines=o3d.utility.Vector2iVector(aix_lines))

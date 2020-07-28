@@ -51,9 +51,7 @@ def fit_line(points_array, show_figure):
     x = points_array[:, 0]
     y = points_array[:, 1]
     x_new = np.linspace(x[0], x[-1], num=len(x)*10)
-
     coefs = poly.polyfit(x, y, 2)
-    # ffit = poly.polyval(x_new, coefs)
 
     y_draw = []
     for num in x_new:
@@ -61,7 +59,6 @@ def fit_line(points_array, show_figure):
 
     if show_figure:
         plt.plot(x, y, label="line 1")
-        # plt.plot(x_new, ffit, label = "line 2")
         plt.plot(x_new, y_draw, label="line 3")
 
         plt.legend()
