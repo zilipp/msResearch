@@ -43,15 +43,17 @@ def mesh_to_points_cloud(scan_obj):
 
 def remove_background(scan_pcd, bone_type):
     # find plane using RANSAC: plane function: ax + by + cz + d = 0
+
     plane_model, inliers = None, None
-    if bone_type == 'femur':
-        plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_femur,
-                                                      ransac_n=ransac_n,
-                                                      num_iterations=num_iterations)
-    elif bone_type == 'radius':
+    if bone_type == 'radius':
         plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_radius,
                                                       ransac_n=ransac_n,
                                                       num_iterations=num_iterations)
+    else:
+        plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_femur,
+                                                      ransac_n=ransac_n,
+                                                      num_iterations=num_iterations)
+
     plane = plane_model
     # print(f"Plane equation: {plane[0]:.5f}x + {plane[1]:.5f}y + {plane[2]:.5f}z + {plane[3]:.5f} = 0")
 
@@ -162,28 +164,38 @@ def get_alpha_shape(points, bone_type, show_figure):
         # Return the index of the largest area
         alpha_shape = alpha_shape[max_area]
 
-    if bone_type == 'tibia' or bone_type == 'radius':
+    if bone_type == 'radius':
         return alpha_shape
+    elif bone_type == 'tibia':
+        (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
+        x_length = max_x - min_x
+        # need bigger part on the left
+        left_box = Polygon([(min_x, min_y), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y)])
+        left_bone = alpha_shape.intersection(left_box)
+        right_box = Polygon([(max_x - x_length / 10, min_y), (max_x - x_length / 10, max_y), (max_x, max_y), (max_x, min_y)])
+        right_bone = alpha_shape.intersection(right_box)
+        if left_bone.area < right_bone.area:
+            alpha_shape = affinity.scale(alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
+    else:
+        # both femur and humerus need put head to right-lower corner
+        (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
+        x_length = max_x - min_x
+        y_length = max_y - min_y
 
-    # both femur and humerus need put head to right-lower corner
-    (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
-    x_length = max_x - min_x
-    y_length = max_y - min_y
+        # head on the left or right
+        left_box = Polygon([(min_x, min_y), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y)])
+        left_bone = alpha_shape.intersection(left_box)
+        right_box = Polygon([(max_x - x_length / 10, min_y), (max_x - x_length / 10, max_y), (max_x, max_y), (max_x, min_y)])
+        right_bone = alpha_shape.intersection(right_box)
+        if left_bone.area < right_bone.area:
+            alpha_shape = affinity.scale(alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
 
-    # head on the left or right
-    left_box = Polygon([(min_x, min_y), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y)])
-    left_bone = alpha_shape.intersection(left_box)
-    right_box = Polygon([(max_x - x_length / 10, min_y), (max_x - x_length / 10, max_y), (max_x, max_y), (max_x, min_y)])
-    right_bone = alpha_shape.intersection(right_box)
-    if left_bone.area < right_bone.area:
-        alpha_shape = affinity.scale(alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
+        # head on the upper or lower part
+        center_box = Polygon([(min_x + x_length * 0.4, min_y), (min_x + x_length * 0.4, max_y), (max_x + x_length * 0.6, max_y), (max_x + x_length * 0.6, min_y)])
+        center_bone = alpha_shape.intersection(center_box)
 
-    # head on the upper or lower part
-    center_box = Polygon([(min_x + x_length * 0.4, min_y), (min_x + x_length * 0.4, max_y), (max_x + x_length * 0.6, max_y), (max_x + x_length * 0.6, min_y)])
-    center_bone = alpha_shape.intersection(center_box)
-
-    if (max_y - center_bone.centroid.y) > y_length / 2:
-        alpha_shape = affinity.scale(alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
+        if (max_y - center_bone.centroid.y) > y_length / 2:
+            alpha_shape = affinity.scale(alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
 
     if show_figure:
         fig, ax = plt.subplots()

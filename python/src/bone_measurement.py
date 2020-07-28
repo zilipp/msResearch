@@ -21,9 +21,9 @@ _user_logs_file = _root_dir / 'out/logs/user_logs/logs.txt'  # User logging dire
 # process more files
 multi_files = False
 # switch for figure
-show_figure = False
+show_figure = True
 # bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
-bone_type = 'radius'
+bone_type = 'tibia'
 
 
 def init_logger(log_file=_user_logs_file):
@@ -52,7 +52,7 @@ def load_file(index=2):
         scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus_1.obj")
     elif bone_type == 'tibia':
         # scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_0.obj")
-        scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_1.obj")
+        scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_" + str(index) + ".obj")
     elif bone_type == 'radius':
         # scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_0.obj")
         scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_" + str(index) + ".obj")
