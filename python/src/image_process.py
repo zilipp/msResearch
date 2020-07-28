@@ -14,6 +14,11 @@ from matplotlib import pyplot as plt
 from utilities import distance_util
 from utilities import visualization_util
 
+# params for remove background
+distance_threshold_femur = 3
+distance_threshold_radius = 3
+ransac_n = 3
+num_iterations = 1000
 
 nb_neighbors_femur = 20
 nb_neighbors_radius = 20
@@ -36,11 +41,17 @@ def mesh_to_points_cloud(scan_obj):
     return scan_pcd
 
 
-def remove_background(scan_pcd):
+def remove_background(scan_pcd, bone_type):
     # find plane using RANSAC: plane function: ax + by + cz + d = 0
-    plane_model, inliers = scan_pcd.segment_plane(distance_threshold=3,
-                                                  ransac_n=3,
-                                                  num_iterations=1000)
+    plane_model, inliers = None, None
+    if bone_type == 'femur':
+        plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_femur,
+                                                      ransac_n=ransac_n,
+                                                      num_iterations=num_iterations)
+    elif bone_type == 'radius':
+        plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_radius,
+                                                      ransac_n=ransac_n,
+                                                      num_iterations=num_iterations)
     plane = plane_model
     # print(f"Plane equation: {plane[0]:.5f}x + {plane[1]:.5f}y + {plane[2]:.5f}z + {plane[3]:.5f} = 0")
 
@@ -194,7 +205,7 @@ def preprocess_bone(scan_obj, bone_type, show_figure):
     scan_pcd = mesh_to_points_cloud(scan_obj)
 
     # 3. Remove background
-    bone_cloud, plane = remove_background(scan_pcd)
+    bone_cloud, plane = remove_background(scan_pcd, bone_type)
 
     # 4. Remove noise points
     bone_cloud = remove_noise_points(bone_cloud, bone_type, show_figure)

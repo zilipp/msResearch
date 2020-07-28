@@ -19,11 +19,11 @@ import image_process
 _root_dir = Path(os.path.dirname(os.path.abspath(__file__))) / '..'
 _user_logs_file = _root_dir / 'out/logs/user_logs/logs.txt'  # User logging directory.
 # process more files
-multi_files = True
+multi_files = False
 # switch for figure
 show_figure = False
 # bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
-bone_type = 'femur'
+bone_type = 'radius'
 
 
 def init_logger(log_file=_user_logs_file):
@@ -41,21 +41,21 @@ def init_logger(log_file=_user_logs_file):
     logging.getLogger().addHandler(file_handler)
 
 
-def load_file(index=0):
+def load_file(index=2):
     logging.info('loading {0} file...'.format(bone_type))
     scan_obj = None
     if bone_type == 'femur':
-        # scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_half_4.obj")
-        scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur0720_" + str(index) + ".obj")
+        # scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_0.obj")
+        scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_" + str(index) + ".obj")
     elif bone_type == 'humerus':
-        # scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus_multi_perspective.obj")
-        scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus0720.obj")
+        # scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus_0.obj")
+        scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus_1.obj")
     elif bone_type == 'tibia':
-        # scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_multi_perspective.obj")
-        scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia0720.obj")
+        # scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_0.obj")
+        scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_1.obj")
     elif bone_type == 'radius':
-        # scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_multi_perspective.obj")
-        scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius0720.obj")
+        # scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_0.obj")
+        scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_" + str(index) + ".obj")
     else:
         logging.error('load_file(): BoneType is not defined')
 
@@ -90,7 +90,7 @@ def multi_main():
     # 0. Prepare logging file
     init_logger(_user_logs_file)
 
-    for i in range(8):
+    for i in range(9):
         # 1. Load file
         scan_obj = load_file(i)
 
