@@ -9,10 +9,15 @@ import numpy.polynomial.polynomial as poly
 from utilities import distance_util
 from utilities import bone_region_util
 
+# parameter to tune error
+rml_coeff = 0.996
+rmld_coeff = 1.035
+
 
 def get_rml(alpha_shape):
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
     rml = max_x - min_x
+    rml /= rml_coeff
     logging.info('rml: {0:0.3f}'.format(rml))
 
 
@@ -61,6 +66,7 @@ def get_rmld(center_bone_points, show_figure):
         min_line_segment_length = min(dis_cur, min_line_segment_length)
 
     rmld = math.sqrt(min_line_segment_length)
+    rmld /= rmld_coeff
     logging.info('rmld: {0:0.3f}'.format(rmld))
     return rmld
 

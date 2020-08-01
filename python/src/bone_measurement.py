@@ -19,9 +19,10 @@ import image_process
 _root_dir = Path(os.path.dirname(os.path.abspath(__file__))) / '..'
 _user_logs_file = _root_dir / 'out/logs/user_logs/logs.txt'  # User logging directory.
 # process more files
-multi_files = False
+multi_files = True
+index_default = 2
 # switch for figure
-show_figure = True
+show_figure = False
 # bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
 bone_type = 'tibia'
 
@@ -41,7 +42,7 @@ def init_logger(log_file=_user_logs_file):
     logging.getLogger().addHandler(file_handler)
 
 
-def load_file(index=2):
+def load_file(index=index_default):
     logging.info('loading {0} file...'.format(bone_type))
     scan_obj = None
     if bone_type == 'femur':

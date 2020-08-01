@@ -26,6 +26,10 @@ nb_neighbors_radius = 20
 std_ratio_femur = 0.5
 std_ratio_radius = 2
 
+# params for alpha-shape
+alpha_radius = 0.1
+alpha_femur = 0.4
+
 
 def scale_image(scan_obj):
     # Scale unit length from 1m to 1mm (coordinate 1000x)
@@ -71,7 +75,6 @@ def remove_noise_points(bone_cloud, bone_type, show_figure):
     if bone_type != 'radius':
         cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_femur,
                                                         std_ratio=std_ratio_femur)
-        # cl, ind = bone_cloud.remove_radius_outlier(nb_points=10, radius=5)
     elif bone_type == 'radius':
         cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_radius,
                                                         std_ratio=std_ratio_radius)
@@ -147,13 +150,18 @@ def three_d_to_two_d(bone_pcd):
 
 def get_alpha_shape(points, bone_type, show_figure):
     # todo: a-value
-    alpha_shape = alphashape.alphashape(points, 0.4)
+    alpha_shape = None
+    if bone_type == 'radius':
+        alpha_shape = alphashape.alphashape(points, alpha_radius)
+    else:
+        alpha_shape = alphashape.alphashape(points, alpha_femur)
 
     if show_figure:
         alpha_shape_pts = alpha_shape.exterior.coords.xy
         fig, ax = plt.subplots()
+        ax.scatter(points[:, 0], points[:, 1], color='blue')
         ax.scatter(alpha_shape_pts[0], alpha_shape_pts[1], color='red')
-        ax.add_patch(PolygonPatch(alpha_shape, fill=False, color='green'))
+        # ax.add_patch(PolygonPatch(alpha_shape, fill=False, color='green'))
         ax.set_aspect('equal')
         plt.show()
 
