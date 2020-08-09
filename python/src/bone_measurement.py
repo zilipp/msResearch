@@ -24,7 +24,7 @@ index_default = 2
 # switch for figure
 show_figure = False
 # bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
-bone_type = 'femur'
+bone_type = 'humerus'
 
 
 def init_logger(log_file=_user_logs_file):

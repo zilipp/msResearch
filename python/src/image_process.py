@@ -216,7 +216,7 @@ def get_alpha_shape(points, bone_type, show_figure):
 
 
 def preprocess_bone(scan_obj, bone_type, show_figure):
-    logging.info('pre-processing bones...')
+    logging.info('Pre-processing {}'.format(bone_type))
 
     # 1. Scale unit length to 1 mm(coordinate 1000x)
     scan_obj = scale_image(scan_obj)
