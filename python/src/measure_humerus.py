@@ -153,11 +153,17 @@ def get_hhd_new(bone_right_region, right_region_points_ordered):
 
     max_dist = 0
     point_c_idx = 0
-    for i in range(point_a_idx[0], point_b_idx[0]):
-        dist = distance_util.distance_point_to_line(point_a, point_b, right_region_points_ordered[i])
-        if dist > max_dist:
-            max_dist = dist
-            point_c_idx = i
+
+    num_of_points_between_a_b = point_b_idx[0] - point_a_idx[0]
+    if num_of_points_between_a_b >= 3:
+        for i in range(point_a_idx[0], point_b_idx[0] - 2):
+            dist = 0
+            for j in range(0, 3):
+                dist = dist + distance_util.distance_point_to_line(point_a, point_b, right_region_points_ordered[i+j])
+            if dist > max_dist:
+                max_dist = dist
+                point_c_idx = i + 1
+
     point_c = right_region_points_ordered[point_c_idx]
 
     # Find bottom point d
