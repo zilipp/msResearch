@@ -19,8 +19,8 @@ import image_process
 _root_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent
 _user_logs_file = os.path.join(_root_dir, 'python\\out\\logs\\user_logs', 'logs.txt')  # User logging directory. 
 # process more files
-multi_files = True
-index_default = 2
+multi_files = False
+index_default = 4
 # switch for figure
 show_figure = False
 # bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
@@ -70,7 +70,7 @@ def main():
     elif bone_type == 'tibia':
         measure_tibia.get_measurement(alpha_shape)
     elif bone_type == 'humerus':
-        measure_humerus.get_measurement(alpha_shape)
+        measure_humerus.get_measurement(alpha_shape, show_figure)
     elif bone_type == 'radius':
         measure_radius.get_measurement(alpha_shape, show_figure)
 
@@ -92,7 +92,7 @@ def multi_main():
         elif bone_type == 'tibia':
             measure_tibia.get_measurement(alpha_shape)
         elif bone_type == 'humerus':
-            measure_humerus.get_measurement(alpha_shape)
+            measure_humerus.get_measurement(alpha_shape, show_figure)
         elif bone_type == 'radius':
             measure_radius.get_measurement(alpha_shape, show_figure)
 

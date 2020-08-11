@@ -17,14 +17,17 @@ from utilities import visualization_util
 # params for remove background
 distance_threshold_femur = 3
 distance_threshold_radius = 3
+distance_threshold_tibia = 2
 ransac_n = 3
 num_iterations = 1000
 
 nb_neighbors_femur = 20
 nb_neighbors_radius = 20
+nb_neighbors_humerus = 20
 
 std_ratio_femur = 0.5
 std_ratio_radius = 2
+std_ratio_humerus = 2
 
 # params for alpha-shape
 alpha_radius = 0.1
@@ -53,6 +56,11 @@ def remove_background(scan_pcd, bone_type):
         plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_radius,
                                                       ransac_n=ransac_n,
                                                       num_iterations=num_iterations)
+    elif bone_type == 'tibia':
+        plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_tibia,
+                                                      ransac_n=ransac_n,
+                                                      num_iterations=num_iterations)
+
     else:
         plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_femur,
                                                       ransac_n=ransac_n,
@@ -72,12 +80,16 @@ def remove_background(scan_pcd, bone_type):
 
 def remove_noise_points(bone_cloud, bone_type, show_figure):
     cl, ind = None, None
-    if bone_type != 'radius':
-        cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_femur,
-                                                        std_ratio=std_ratio_femur)
+
+    if bone_type == 'humerus':
+        cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_humerus,
+                                                        std_ratio=std_ratio_humerus)
     elif bone_type == 'radius':
         cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_radius,
                                                         std_ratio=std_ratio_radius)
+    else:
+        cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_femur,
+                                                        std_ratio=std_ratio_femur)
 
     # display outliers
     if show_figure:
@@ -156,6 +168,13 @@ def get_alpha_shape(points, bone_type, show_figure):
     else:
         alpha_shape = alphashape.alphashape(points, alpha_femur)
 
+    if alpha_shape.geom_type == 'MultiPolygon':
+        areas = [i.area for i in alpha_shape]
+        # Get the area of the largest part
+        max_area = areas.index(max(areas))
+        # Return the index of the largest area
+        alpha_shape = alpha_shape[max_area]
+
     if show_figure:
         alpha_shape_pts = alpha_shape.exterior.coords.xy
         fig, ax = plt.subplots()
@@ -164,13 +183,6 @@ def get_alpha_shape(points, bone_type, show_figure):
         # ax.add_patch(PolygonPatch(alpha_shape, fill=False, color='green'))
         ax.set_aspect('equal')
         plt.show()
-
-    if alpha_shape.geom_type == 'MultiPolygon':
-        areas = [i.area for i in alpha_shape]
-        # Get the area of the largest part
-        max_area = areas.index(max(areas))
-        # Return the index of the largest area
-        alpha_shape = alpha_shape[max_area]
 
     if bone_type == 'radius':
         return alpha_shape

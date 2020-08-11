@@ -2,6 +2,9 @@
 import logging
 from shapely.geometry import Polygon
 
+tml_coeff = 0.995
+tpb_coeff = 0.985
+
 
 def get_tml(alpha_shape):
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
@@ -20,12 +23,14 @@ def get_tml(alpha_shape):
     (min_x_left_lower, _, _, _) = left_lower_bone.exterior.bounds
 
     tml = max_x - min(min_x_left_upper, min_x_left_lower)
+    tml /= tml_coeff
     logging.info('tml: {0:0.3f}'.format(tml))
 
 
 def get_tpb(alpha_shape):
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
     tpb = max_y - min_y
+    tpb /= tpb_coeff
     logging.info('tpb: {0:0.3f}'.format(tpb))
 
 
