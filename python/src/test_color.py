@@ -8,6 +8,7 @@ import open3d as o3d
 import numpy as np
 
 # self defined functions
+from base import Bone
 import measure_femur
 import measure_humerus
 import measure_radius
@@ -24,8 +25,8 @@ multi_files = False
 index_default = 4
 # switch for figure
 show_figure = True
-# bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
-bone_type = 'humerus'
+# bone type: Bone.Type.FEMUR / Bone.Type.TIBIA / Bone.Type.HUMERUS / Bone.Type.RADIUS
+bone_type = Bone.Type.HUMERUS
 
 
 def init_logger(log_file=_user_logs_file):
@@ -45,7 +46,7 @@ def init_logger(log_file=_user_logs_file):
 
 def load_file(index=index_default):
     obj_dir = os.path.join(_root_dir, 'data', 'color', 'model.obj')
-    # obj_dir = os.path.join(_root_dir, 'data', 'femur', 'femur_0.obj')
+    # obj_dir = os.path.join(_root_dir, 'data', Bone.Type.FEMUR, 'femur_0.obj')
     scan_obj = o3d.io.read_triangle_mesh(obj_dir)
 
     logging.info('Loading {0} file from {1}'.format(bone_type, obj_dir))
@@ -100,13 +101,13 @@ def main():
     # alpha_shape = image_process.preprocess_bone(scan_obj, bone_type, show_figure)
     #
     # # 3 Measurements
-    # if bone_type == 'femur':
+    # if bone_type == Bone.Type.FEMUR:
     #     measure_femur.get_measurement(alpha_shape, show_figure)
-    # elif bone_type == 'tibia':
+    # elif bone_type == Bone.Type.TIBIA:
     #     measure_tibia.get_measurement(alpha_shape)
-    # elif bone_type == 'humerus':
+    # elif bone_type == Bone.Type.HUMERUS:
     #     measure_humerus.get_measurement(alpha_shape, show_figure)
-    # elif bone_type == 'radius':
+    # elif bone_type == Bone.Type.RADIUS:
     #     measure_radius.get_measurement(alpha_shape, show_figure)
 
 

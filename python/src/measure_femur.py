@@ -224,7 +224,7 @@ def get_fhd(right_bone, right_bone_points_ordered):
 
 
 def get_measurement(alpha_shape, show_figure):
-    logging.info('Start measuring femur...')
+    logging.info('Start measuring femur')
 
     left_region, left_region_points_ordered = bone_region_util.get_left_region(alpha_shape)
     center_region, center_region_points = bone_region_util.get_center_region(alpha_shape)
