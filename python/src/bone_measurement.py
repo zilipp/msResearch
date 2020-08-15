@@ -22,7 +22,7 @@ _user_logs_file = os.path.join(_root_dir, 'python\\out\\logs\\user_logs', 'logs.
 multi_files = False
 index_default = 4
 # switch for figure
-show_figure = False
+show_figure = True
 # bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
 bone_type = 'humerus'
 
