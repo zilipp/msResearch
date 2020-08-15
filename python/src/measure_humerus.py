@@ -5,6 +5,7 @@ import numpy
 from matplotlib import pyplot
 
 # self defined functions
+from base import Bone
 from utilities import distance_util
 from utilities import bone_region_util
 
@@ -12,14 +13,16 @@ from utilities import bone_region_util
 def get_hml(alpha_shape):
     (min_x, _min_y, max_x, _max_y) = alpha_shape.exterior.bounds
     hml = max_x - min_x
-    logging.info('hml: {0:0.3f}'.format(hml))
 
+    logging.info('hml: {0:0.3f}'.format(hml))
+    return hml
 
 def get_heb(left_bone):
     (_left_bone_min_x, left_bone_min_y, _left_bone_max_x, left_bone_max_y) = left_bone.exterior.bounds
     heb = left_bone_max_y - left_bone_min_y
-    logging.info('heb: {0:0.3f}'.format(heb))
 
+    logging.info('heb: {0:0.3f}'.format(heb))
+    return heb
 
 def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
     (x_min, y_min, x_max, y_max) = bone_right_region.exterior.bounds
@@ -96,12 +99,12 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
     return hhd
 
 
-def get_measurement(alpha_shape, show_figure):
+def get_measurement(humerus, show_figure):
     logging.info('Start measuring humerus...')
 
-    left_region, _ = bone_region_util.get_left_region(alpha_shape)
-    right_region, right_region_points_ordered = bone_region_util.get_right_region(alpha_shape)
+    left_region, _ = bone_region_util.get_left_region(humerus.alpha_shape)
+    right_region, right_region_points_ordered = bone_region_util.get_right_region(humerus.alpha_shape)
 
-    get_hml(alpha_shape)
-    get_heb(left_region)
-    get_hhd(right_region, right_region_points_ordered, show_figure)
+    humerus.hml = get_hml(humerus.alpha_shape)
+    humerus.heb = get_heb(left_region)
+    humerus.hhd = get_hhd(right_region, right_region_points_ordered, show_figure)

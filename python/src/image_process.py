@@ -11,6 +11,7 @@ from descartes import PolygonPatch
 from matplotlib import pyplot as plt
 
 # self defined functions
+from base import Bone
 from utilities import distance_util
 from utilities import visualization_util
 
@@ -52,11 +53,11 @@ def remove_background(scan_pcd, bone_type):
     # find plane using RANSAC: plane function: ax + by + cz + d = 0
 
     plane_model, inliers = None, None
-    if bone_type == 'radius':
+    if bone_type == Bone.Type.RADIUS:
         plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_radius,
                                                       ransac_n=ransac_n,
                                                       num_iterations=num_iterations)
-    elif bone_type == 'tibia':
+    elif bone_type == Bone.Type.TIBIA:
         plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_tibia,
                                                       ransac_n=ransac_n,
                                                       num_iterations=num_iterations)
@@ -81,10 +82,10 @@ def remove_background(scan_pcd, bone_type):
 def remove_noise_points(bone_cloud, bone_type, show_figure):
     cl, ind = None, None
 
-    if bone_type == 'humerus':
+    if bone_type == Bone.Type.HUMERUS:
         cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_humerus,
                                                         std_ratio=std_ratio_humerus)
-    elif bone_type == 'radius':
+    elif bone_type == Bone.Type.RADIUS:
         cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_radius,
                                                         std_ratio=std_ratio_radius)
     else:
@@ -163,7 +164,7 @@ def three_d_to_two_d(bone_pcd):
 def get_alpha_shape(points, bone_type, show_figure):
     # todo: a-value
     alpha_shape = None
-    if bone_type == 'radius':
+    if bone_type == Bone.Type.RADIUS:
         alpha_shape = alphashape.alphashape(points, alpha_radius)
     else:
         alpha_shape = alphashape.alphashape(points, alpha_femur)
@@ -184,9 +185,9 @@ def get_alpha_shape(points, bone_type, show_figure):
         ax.set_aspect('equal')
         plt.show()
 
-    if bone_type == 'radius':
+    if bone_type == Bone.Type.RADIUS:
         return alpha_shape
-    elif bone_type == 'tibia':
+    elif bone_type == Bone.Type.TIBIA:
         (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
         x_length = max_x - min_x
         # need bigger part on the left
@@ -228,7 +229,7 @@ def get_alpha_shape(points, bone_type, show_figure):
 
 
 def preprocess_bone(scan_obj, bone_type, show_figure):
-    logging.info('Pre-processing {}'.format(bone_type))
+    logging.info('Pre-processing {}'.format(bone_type.name.lower()))
 
     # 1. Scale unit length to 1 mm(coordinate 1000x)
     scan_obj = scale_image(scan_obj)
@@ -255,13 +256,13 @@ def preprocess_bone(scan_obj, bone_type, show_figure):
     alpha_shape = get_alpha_shape(bone_points, bone_type, show_figure)
 
     # # 8. Save file
-    # if bone_type == 'femur':
+    # if bone_type == Bone.Type.FEMUR:
     #     o3d.io.write_point_cloud("./data/femur/whole_femur_2d_bone.ply", bone_pcd)
-    # elif bone_type == 'tibia':
+    # elif bone_type == Bone.Type.TIBIA:
     #     o3d.io.write_point_cloud("./data/tibia/whole_tibia_2d_bone.ply", bone_pcd)
-    # elif bone_type == 'humerus':
+    # elif bone_type == Bone.Type.HUMERUS:
     #     o3d.io.write_point_cloud("./data/humerus/whole_humerus_2d_bone.ply", bone_pcd)
-    # elif bone_type == 'radius':
+    # elif bone_type == Bone.Type.RADIUS:
     #     o3d.io.write_point_cloud("./data/radius/whole_radius_2d_bone.ply", bone_pcd)
 
     return alpha_shape

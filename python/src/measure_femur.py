@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy.polynomial.polynomial as poly
 
 # self defined functions
+from base import Bone
 from utilities import distance_util
 from utilities import bone_region_util
 
@@ -21,6 +22,7 @@ def get_fml(alpha_shape):
     fml = max_x - min_x
     fml /= fml_coeff
     logging.info('fml: {0:0.3f}'.format(fml))
+    return fml
 
 
 def get_feb(left_bone):
@@ -28,6 +30,7 @@ def get_feb(left_bone):
     feb = left_bone_max_y - left_bone_min_y
     feb /= feb_coeff
     logging.info('feb: {0:0.3f}'.format(feb))
+    return feb
 
 
 def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
@@ -70,6 +73,7 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
 
     fbml /= fbml_coeff
     logging.info('fbml: {0:0.3f}'.format(fbml))
+    return fbml
 
 
 def get_fmld(center_bone_points, show_figure):
@@ -120,6 +124,7 @@ def get_fmld(center_bone_points, show_figure):
     fmld = math.sqrt(min_line_segment_length)
     fmld /= fmld_coeff
     logging.info('fmld: {0:0.3f}'.format(fmld))
+    return fmld
 
 
 def get_fhd(right_bone, right_bone_points_ordered):
@@ -221,17 +226,18 @@ def get_fhd(right_bone, right_bone_points_ordered):
 
     fhd /= fhd_coeff
     logging.info('fhd: {0:0.3f}'.format(fhd))
+    return fhd
 
 
-def get_measurement(alpha_shape, show_figure):
-    logging.info('Start measuring femur...')
+def get_measurement(femur, show_figure):
+    logging.info('Start measuring femur')
 
-    left_region, left_region_points_ordered = bone_region_util.get_left_region(alpha_shape)
-    center_region, center_region_points = bone_region_util.get_center_region(alpha_shape)
-    right_region, right_region_points_ordered = bone_region_util.get_right_region(alpha_shape)
+    left_region, left_region_points_ordered = bone_region_util.get_left_region(femur.alpha_shape)
+    center_region, center_region_points = bone_region_util.get_center_region(femur.alpha_shape)
+    right_region, right_region_points_ordered = bone_region_util.get_right_region(femur.alpha_shape)
 
-    get_fml(alpha_shape)
-    get_feb(left_region)
-    get_fbml(left_region, left_region_points_ordered, right_region_points_ordered)
-    get_fmld(center_region_points, show_figure)
-    get_fhd(right_region, right_region_points_ordered)
+    femur.fml = get_fml(femur.alpha_shape)
+    femur.feb = get_feb(left_region)
+    femur.fbml = get_fbml(left_region, left_region_points_ordered, right_region_points_ordered)
+    femur.fmld = get_fmld(center_region_points, show_figure)
+    femur.fhd = get_fhd(right_region, right_region_points_ordered)
