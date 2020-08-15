@@ -65,4 +65,3 @@ def fit_line(points_array, show_figure):
         # plt.axes().set_aspect(1)
         plt.show()
     return coefs
-

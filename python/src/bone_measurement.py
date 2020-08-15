@@ -16,14 +16,15 @@ import image_process
 
 # global variants
 # logging file info
-_root_dir = Path(os.path.dirname(os.path.abspath(__file__))) / '..'
-_user_logs_file = _root_dir / 'out/logs/user_logs/logs.txt'  # User logging directory.
+_root_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent
+_user_logs_file = os.path.join(_root_dir, 'python\\out\\logs\\user_logs', 'logs.txt')  # User logging directory. 
 # process more files
 multi_files = False
+index_default = 4
 # switch for figure
-show_figure = False
+show_figure = True
 # bone type: 'femur' / 'tibia' / 'humerus' / 'radius'
-bone_type = 'radius'
+bone_type = 'humerus'
 
 
 def init_logger(log_file=_user_logs_file):
@@ -41,25 +42,13 @@ def init_logger(log_file=_user_logs_file):
     logging.getLogger().addHandler(file_handler)
 
 
-def load_file(index=2):
-    logging.info('loading {0} file...'.format(bone_type))
-    scan_obj = None
-    if bone_type == 'femur':
-        # scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_0.obj")
-        scan_obj = o3d.io.read_triangle_mesh("../../data/femur/femur_" + str(index) + ".obj")
-    elif bone_type == 'humerus':
-        # scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus_0.obj")
-        scan_obj = o3d.io.read_triangle_mesh("../../data/humerus/humerus_1.obj")
-    elif bone_type == 'tibia':
-        # scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_0.obj")
-        scan_obj = o3d.io.read_triangle_mesh("../../data/tibia/tibia_1.obj")
-    elif bone_type == 'radius':
-        # scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_0.obj")
-        scan_obj = o3d.io.read_triangle_mesh("../../data/radius/radius_" + str(index) + ".obj")
-    else:
-        logging.error('load_file(): BoneType is not defined')
+def load_file(index=index_default):
+    obj_dir = os.path.join(_root_dir, 'data', bone_type, '{}_{}.obj'.format(bone_type, str(index)))
+    scan_obj = o3d.io.read_triangle_mesh(obj_dir)
 
+    logging.info('Loading {0} file from {1}'.format(bone_type, obj_dir))
     logging.info(scan_obj)
+
     if show_figure:
         o3d.visualization.draw_geometries([scan_obj], mesh_show_wireframe=True)
     return scan_obj
@@ -81,7 +70,7 @@ def main():
     elif bone_type == 'tibia':
         measure_tibia.get_measurement(alpha_shape)
     elif bone_type == 'humerus':
-        measure_humerus.get_measurement(alpha_shape)
+        measure_humerus.get_measurement(alpha_shape, show_figure)
     elif bone_type == 'radius':
         measure_radius.get_measurement(alpha_shape, show_figure)
 
@@ -103,7 +92,7 @@ def multi_main():
         elif bone_type == 'tibia':
             measure_tibia.get_measurement(alpha_shape)
         elif bone_type == 'humerus':
-            measure_humerus.get_measurement(alpha_shape)
+            measure_humerus.get_measurement(alpha_shape, show_figure)
         elif bone_type == 'radius':
             measure_radius.get_measurement(alpha_shape, show_figure)
 
