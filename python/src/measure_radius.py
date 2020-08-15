@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy.polynomial.polynomial as poly
 
 # self defined functions
+from base import Bone
 from utilities import distance_util
 from utilities import bone_region_util
 
@@ -19,6 +20,7 @@ def get_rml(alpha_shape):
     rml = max_x - min_x
     rml /= rml_coeff
     logging.info('rml: {0:0.3f}'.format(rml))
+    return rml
 
 
 def get_rmld(center_bone_points, show_figure):
@@ -71,10 +73,10 @@ def get_rmld(center_bone_points, show_figure):
     return rmld
 
 
-def get_measurement(alpha_shape, show_figure):
+def get_measurement(radius, show_figure):
     logging.info('Start measuring radius...')
 
-    center_region, center_region_points = bone_region_util.get_center_region(alpha_shape)
+    center_region, center_region_points = bone_region_util.get_center_region(radius.alpha_shape)
 
-    get_rml(alpha_shape)
-    get_rmld(center_region_points, show_figure)
+    radius.rml = get_rml(radius.alpha_shape)
+    radius.rmld = get_rmld(center_region_points, show_figure)
