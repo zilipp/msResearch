@@ -1,10 +1,12 @@
 # python libraries
-import sys
-import os
-from pathlib import Path
 import logging
-from logging import handlers
+import os
 import open3d as o3d
+import sys
+
+from datetime import datetime
+from logging import handlers
+from pathlib import Path
 
 # self defined functions
 from base import Bone
@@ -16,8 +18,9 @@ import image_process
 _root_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent
 # user log directory
 _user_logs_file = os.path.join(_root_dir, 'python\\out\\logs\\user_logs', 'logs.txt')
+_user_result_dir = os.path.join(_root_dir, 'python\\out\\results')
 # process more files
-multi_files = False
+multi_files = True
 index_default = 4
 # switch for figure
 show_figure = False
@@ -44,7 +47,7 @@ def load_file(index=index_default):
     obj_dir = os.path.join(_root_dir, 'data', bone_type_str, '{}_{}.obj'.format(bone_type_str, str(index)))
     scan_obj = o3d.io.read_triangle_mesh(obj_dir)
 
-    logging.info('Loading {0} file from {1}'.format(bone_type_str, obj_dir))
+    logging.info('Loading {0} dataset from {1}'.format(bone_type_str, obj_dir))
     logging.info(scan_obj)
 
     if show_figure:
@@ -72,16 +75,48 @@ def process(scan_obj):
     bone.measure(show_figure)
     results = bone.get_measurement_results()
     logging.info(results)
+    bone.reset_alpha_shape()
+
+    return bone
+
+
+def csv_out(bones):
+    bone_type_str = bone_type.name.lower()
+    now = datetime.now()
+    dt_string = now.strftime("%Y-%m-%d-%H-%M-%S")
+    filename = '{}-{}.csv'.format(dt_string, bone_type_str)
+    output_file = os.path.join(_user_result_dir, filename)
+    if not os.path.exists(_user_result_dir):
+        os.makedirs(_user_result_dir)
+    logging.info('Writing results to {}'.format(output_file))
+    f = open(output_file, 'w')
+
+    result = bones[0].get_measurement_results()
+    keys = sorted(result)
+    title = ','.join(keys)
+    f.write(title+'\n')
+    for bone in bones:
+        row = list()
+        measurement_results = bone.get_measurement_results()
+        for key in keys:
+            row.append(str(measurement_results[key]))
+        line = ','.join(row)
+        f.write(line+'\n')
+    f.close()
 
 
 if __name__ == "__main__":
     init_logger(_user_logs_file)
 
+    bones = list()
     if multi_files:
         for i in range(9):
             # 1. Load file
             scan_obj = load_file(i)
-            process(scan_obj)
+            bones.append(process(scan_obj))
     else:
         scan_obj = load_file()
-        process(scan_obj)
+        bones.append(process(scan_obj))
+
+    csv_out(bones)
+
