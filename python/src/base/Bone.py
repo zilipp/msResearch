@@ -92,12 +92,12 @@ class Tibia(BaseBone):
     def __init__(self, alpha_shape=None):
         super().__init__(alpha_shape)
         self.tml = None
-        self.tpd = None
+        self.tpb = None
 
     def get_measurement_results(self):
         measurements = {
             'tml': self.tml,
-            'tpd': self.tpd
+            'tpb': self.tpb
         }
         return measurements
 

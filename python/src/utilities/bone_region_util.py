@@ -69,7 +69,7 @@ def get_right_region(alpha_shape):
 def get_center_region(alpha_shape):
     (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
     # todo: coefficient
-    center_box = Polygon([(minx / 3, miny), (minx / 3, maxy), (maxx / 3, maxy), (maxx / 3, miny)])
+    center_box = Polygon([(minx / 4, miny), (minx / 4, maxy), (maxx / 4, maxy), (maxx / 4, miny)])
     center_bone = alpha_shape.intersection(center_box)
 
     center_bone_line = center_bone.exterior

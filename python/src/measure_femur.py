@@ -20,7 +20,7 @@ fhd_coeff = 0.971
 def get_fml(alpha_shape):
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
     fml = max_x - min_x
-    fml /= fml_coeff
+    # fml /= fml_coeff
     logging.info('fml: {0:0.3f}'.format(fml))
     return fml
 
@@ -28,7 +28,7 @@ def get_fml(alpha_shape):
 def get_feb(left_bone):
     (left_bone_min_x, left_bone_min_y, left_bone_max_x, left_bone_max_y) = left_bone.exterior.bounds
     feb = left_bone_max_y - left_bone_min_y
-    feb /= feb_coeff
+    # feb /= feb_coeff
     logging.info('feb: {0:0.3f}'.format(feb))
     return feb
 
@@ -71,7 +71,7 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
     for i in range(len(right_bone_points_ordered)):
         fbml = max(fbml, distance_util.distance_point_to_line(p_left, p_left_second, right_bone_points_ordered[i]))
 
-    fbml /= fbml_coeff
+    # fbml /= fbml_coeff
     logging.info('fbml: {0:0.3f}'.format(fbml))
     return fbml
 
@@ -122,7 +122,7 @@ def get_fmld(center_bone_points, show_figure):
         min_line_segment_length = min(dis_cur, min_line_segment_length)
 
     fmld = math.sqrt(min_line_segment_length)
-    fmld /= fmld_coeff
+    # fmld /= fmld_coeff
     logging.info('fmld: {0:0.3f}'.format(fmld))
     return fmld
 
@@ -224,7 +224,7 @@ def get_fhd(right_bone, right_bone_points_ordered):
             count_decrease = 0
         iterate_idx -= 1
 
-    fhd /= fhd_coeff
+    # fhd /= fhd_coeff
     logging.info('fhd: {0:0.3f}'.format(fhd))
     return fhd
 

@@ -34,7 +34,6 @@ def get_rmld(center_bone_points, show_figure):
     # fit two lines
     top_line_p = distance_util.fit_line(center_bone_points_upper, show_figure)
     bottom_line_p = distance_util.fit_line(center_bone_points_lower, show_figure)
-    # print(top_line_p, bottom_line_p)
 
     if show_figure:
         x = np.linspace(-25, 25, num=100)
@@ -42,32 +41,39 @@ def get_rmld(center_bone_points, show_figure):
         b = bottom_line_p[2] * x * x + bottom_line_p[1] * x + bottom_line_p[0]
         plt.plot(x, a, 'r')  # plotting t, a separately
         plt.plot(x, b, 'b')  # plotting t, b separately
+
+        plt.scatter(center_bone_points_upper[:, 0], center_bone_points_upper[:, 1])
+        plt.scatter(center_bone_points_lower[:, 0], center_bone_points_lower[:, 1])
+
+        plt.scatter(center_bone_points_upper[:, 0], center_bone_points_upper[:, 1], marker='+')
+        plt.scatter(center_bone_points_lower[:, 0], center_bone_points_lower[:, 1],  marker='+')
+
         plt.plot([0], [0], '*')  # plotting t, c separately
         plt.show()
 
     # vertical line
     rmld = poly.polyval(0, top_line_p) - poly.polyval(0, bottom_line_p)
 
-    min_line_segment_length = rmld ** 2
-    for i in np.arange(-30, 30, .05):
-        if i == 0:
-            continue
-        x = i
-        y = top_line_p[2] * x * x + top_line_p[1] * x + top_line_p[0]
-        k = y / x
-        [x_res1, x_res2] = np.roots([bottom_line_p[2], bottom_line_p[1] - k, bottom_line_p[0]])
-
-        y_res1 = k * x_res1
-        dis_1 = x_res1 ** 2 + y_res1 ** 2
-        y_res2 = k * x_res2
-        dis_2 = x_res2 ** 2 + y_res2 ** 2
-
-        [x1, y1] = [x_res1, y_res1] if dis_1 < dis_2 else [x_res2, y_res2]
-
-        dis_cur = distance_util.distance_2_point_to_point([x, y], [x1, y1])
-        min_line_segment_length = min(dis_cur, min_line_segment_length)
-
-    rmld = math.sqrt(min_line_segment_length)
+    # min_line_segment_length = rmld ** 2
+    # for i in np.arange(-30, 30, .05):
+    #     if i == 0:
+    #         continue
+    #     x = i
+    #     y = top_line_p[2] * x * x + top_line_p[1] * x + top_line_p[0]
+    #     k = y / x
+    #     [x_res1, x_res2] = np.roots([bottom_line_p[2], bottom_line_p[1] - k, bottom_line_p[0]])
+    #
+    #     y_res1 = k * x_res1
+    #     dis_1 = x_res1 ** 2 + y_res1 ** 2
+    #     y_res2 = k * x_res2
+    #     dis_2 = x_res2 ** 2 + y_res2 ** 2
+    #
+    #     [x1, y1] = [x_res1, y_res1] if dis_1 < dis_2 else [x_res2, y_res2]
+    #
+    #     dis_cur = distance_util.distance_2_point_to_point([x, y], [x1, y1])
+    #     min_line_segment_length = min(dis_cur, min_line_segment_length)
+    #
+    # rmld = math.sqrt(min_line_segment_length)
     rmld /= rmld_coeff
     logging.info('rmld: {0:0.3f}'.format(rmld))
     return rmld

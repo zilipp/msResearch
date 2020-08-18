@@ -1,6 +1,5 @@
 # python libraries
 import logging
-from shapely.geometry import Polygon
 import numpy
 from matplotlib import pyplot
 
@@ -17,12 +16,14 @@ def get_hml(alpha_shape):
     logging.info('hml: {0:0.3f}'.format(hml))
     return hml
 
+
 def get_heb(left_bone):
     (_left_bone_min_x, left_bone_min_y, _left_bone_max_x, left_bone_max_y) = left_bone.exterior.bounds
     heb = left_bone_max_y - left_bone_min_y
 
     logging.info('heb: {0:0.3f}'.format(heb))
     return heb
+
 
 def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
     (x_min, y_min, x_max, y_max) = bone_right_region.exterior.bounds
@@ -78,7 +79,7 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
             point_d_idx = i-1
     point_d = convex_hull[point_d_idx]
 
-    if not show_figure:
+    if show_figure:
         data = numpy.array(right_region_points_ordered)
         x, y = data.T
         pyplot.scatter(x, y, marker='o')
