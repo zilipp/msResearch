@@ -1,9 +1,6 @@
 from enum import Enum
 
-import measure_femur
-import measure_humerus
-import measure_radius
-import measure_tibia
+from scan import measure_radius, measure_tibia, measure_humerus, measure_femur
 
 
 class Type(Enum):

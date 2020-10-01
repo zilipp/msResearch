@@ -6,18 +6,18 @@ import sys
 import pywavefront
 import numpy as np
 
-from datetime import datetime
 from logging import handlers
 from pathlib import Path
 
 # self defined functions
 from base import Bone
-import image_process
-
+from scan import image_process
+from utilities import logging_utils
+from utilities import csv_out_utils
 
 # global variables
 # logging file info
-_root_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent
+_root_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.parent
 # user log directory
 _user_logs_file = os.path.join(_root_dir, 'python\\out\\logs\\user_logs', 'logs.txt')
 _user_result_dir = os.path.join(_root_dir, 'python\\out\\results')
@@ -29,25 +29,9 @@ show_figure = False
 bone_type = Bone.Type.RADIUS
 
 
-
-def init_logger(log_file=_user_logs_file):
-    if not os.path.exists(log_file):
-        os.makedirs(os.path.dirname(log_file))
-
-    log = logging.getLogger('')
-    log.setLevel(logging.INFO)
-    output_format = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-    std_out_handler = logging.StreamHandler(sys.stdout)
-    std_out_handler.setFormatter(output_format)
-    logging.getLogger().addHandler(std_out_handler)
-    file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=(1048576*5), backupCount=7)
-    file_handler.setFormatter(output_format)
-    logging.getLogger().addHandler(file_handler)
-
-
 def load_file(index=index_default):
     bone_type_str = bone_type.name.lower()
-    obj_dir = os.path.join(_root_dir, 'data', bone_type_str, '{}_{}.obj'.format(bone_type_str, str(index)))
+    obj_dir = os.path.join(_root_dir, 'data', 'scan', bone_type_str, '{}_{}.obj'.format(bone_type_str, str(index)))
 
     logging.info('Loading {0} dataset from {1}'.format(bone_type_str, obj_dir))
     scan_obj = pywavefront.Wavefront(obj_dir, strict=True, encoding="iso-8859-1", parse=True)
@@ -87,33 +71,8 @@ def process(scan_pcd):
     return bone
 
 
-def csv_out(bones):
-    bone_type_str = bone_type.name.lower()
-    now = datetime.now()
-    dt_string = now.strftime("%Y-%m-%d-%H-%M-%S")
-    filename = '{}-{}.csv'.format(dt_string, bone_type_str)
-    output_file = os.path.join(_user_result_dir, filename)
-    if not os.path.exists(_user_result_dir):
-        os.makedirs(_user_result_dir)
-    logging.info('Writing results to {}'.format(output_file))
-    f = open(output_file, 'w')
-
-    result = bones[0].get_measurement_results()
-    keys = sorted(result)
-    title = ','.join(keys)
-    f.write(title+'\n')
-    for bone in bones:
-        row = list()
-        measurement_results = bone.get_measurement_results()
-        for key in keys:
-            row.append(str(measurement_results[key]))
-        line = ','.join(row)
-        f.write(line+'\n')
-    f.close()
-
-
 if __name__ == "__main__":
-    init_logger(_user_logs_file)
+    logging_utils.init_logger(_user_logs_file)
 
     bones = list()
     if multi_files:
@@ -125,5 +84,5 @@ if __name__ == "__main__":
         scan_pcd = load_file()
         bones.append(process(scan_pcd))
 
-    csv_out(bones)
+    csv_out_utils.csv_out(bones, bone_type, _user_result_dir)
 
