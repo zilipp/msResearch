@@ -114,7 +114,8 @@ def project_points_to_plane(bone_cloud, plane, show_figure):
     projected_bone_points = []
     for i in range(bone_points.shape[0]):
         point = bone_points[i]
-        projected_bone_points.append(distance_util.point_to_plane(point, plane))
+        projected_bone_points.append(
+            distance_util.point_to_plane(point, plane))
 
     bone_points = np.array(projected_bone_points)
 
@@ -122,7 +123,8 @@ def project_points_to_plane(bone_cloud, plane, show_figure):
     bone_pcd.points = o3d.utility.Vector3dVector(bone_points)
 
     if show_figure:
-        o3d.visualization.draw_geometries([bone_pcd, visualization_util.get_visualization_axis()])
+        o3d.visualization.draw_geometries(
+            [bone_pcd, visualization_util.get_visualization_axis()])
     return bone_pcd
 
 
@@ -150,7 +152,8 @@ def change_axis_with_PCA(bone_pcd, show_figure):
     final_pcd.points = o3d.utility.Vector3dVector(bone_after_pca)
 
     if show_figure:
-        o3d.visualization.draw_geometries([final_pcd, visualization_util.get_visualization_axis()])
+        o3d.visualization.draw_geometries(
+            [final_pcd, visualization_util.get_visualization_axis()])
 
     return final_pcd
 
@@ -198,12 +201,15 @@ def get_alpha_shape(points, bone_type, show_figure):
 
     if bone_type == Bone.Type.TIBIA or bone_type == Bone.Type.RADIUS:
         # radius and tibia: need bigger part on the left
-        left_box = Polygon([(min_x, min_y), (min_x, max_y), (min_x + x_length / 8, max_y), (min_x + x_length / 10, min_y)])
+        left_box = Polygon([(min_x, min_y), (min_x, max_y), (min_x +
+                                                             x_length / 8, max_y), (min_x + x_length / 10, min_y)])
         left_bone = alpha_shape.intersection(left_box)
-        right_box = Polygon([(max_x - x_length / 8, min_y), (max_x - x_length / 8, max_y), (max_x, max_y), (max_x, min_y)])
+        right_box = Polygon([(max_x - x_length / 8, min_y), (max_x -
+                                                             x_length / 8, max_y), (max_x, max_y), (max_x, min_y)])
         right_bone = alpha_shape.intersection(right_box)
         if left_bone.area < right_bone.area:
-            alpha_shape = affinity.scale(alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
+            alpha_shape = affinity.scale(
+                alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
 
     elif bone_type == Bone.Type.FEMUR or bone_type == Bone.Type.HUMERUS:
         # both femur and humerus need put head to right-lower corner
@@ -215,13 +221,16 @@ def get_alpha_shape(points, bone_type, show_figure):
             [(max_x - x_length / 10, min_y), (max_x - x_length / 10, max_y), (max_x, max_y), (max_x, min_y)])
         right_bone = alpha_shape.intersection(right_box)
         if left_bone.area < right_bone.area:
-            alpha_shape = affinity.scale(alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
+            alpha_shape = affinity.scale(
+                alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
 
         # head on the upper or lower part
-        center_box = Polygon([(min_x + x_length * 0.4, min_y), (min_x + x_length * 0.4, max_y), (max_x + x_length * 0.6, max_y), (max_x + x_length * 0.6, min_y)])
+        center_box = Polygon([(min_x + x_length * 0.4, min_y), (min_x + x_length * 0.4, max_y),
+                              (max_x + x_length * 0.6, max_y), (max_x + x_length * 0.6, min_y)])
         center_bone = alpha_shape.intersection(center_box)
         if (max_y - center_bone.centroid.y) > y_length / 2:
-            alpha_shape = affinity.scale(alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
+            alpha_shape = affinity.scale(
+                alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
 
     if not show_figure:
         fig, ax = plt.subplots()
@@ -260,7 +269,6 @@ def preprocess_bone(scan_pcd, bone_type, show_figure):
     # 7. 3d points to 2D points:
     bone_points = three_d_to_two_d(bone_pcd)
 
-    # 7. Get alpha shape
+    # 8. Get alpha shape
     alpha_shape = get_alpha_shape(bone_points, bone_type, show_figure)
     return alpha_shape
-
