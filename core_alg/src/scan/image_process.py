@@ -232,7 +232,7 @@ def get_alpha_shape(points, bone_type, show_figure):
             alpha_shape = affinity.scale(
                 alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
 
-    if not show_figure:
+    if show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
         ax = fig.add_subplot(111)
