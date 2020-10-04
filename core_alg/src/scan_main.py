@@ -17,10 +17,11 @@ from utilities import csv_out_utils
 
 # global variables
 # logging file info
-_root_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent.parent
+_root_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent
 # user log directory
-_user_logs_file = os.path.join(_root_dir, 'python\\out\\logs\\user_logs', 'logs.txt')
-_user_result_dir = os.path.join(_root_dir, 'python\\out\\results')
+_user_logs_file = os.path.join(
+    _root_dir, 'out\\core_alg\\logs\\user_logs', 'logs.txt')
+_user_result_dir = os.path.join(_root_dir, 'out\\core_alg\\results')
 # process more files
 multi_files = True
 index_default = 4
@@ -31,10 +32,12 @@ bone_type = Bone.Type.RADIUS
 
 def load_file(index=index_default):
     bone_type_str = bone_type.name.lower()
-    obj_dir = os.path.join(_root_dir, 'data', 'scan', bone_type_str, '{}_{}.obj'.format(bone_type_str, str(index)))
+    obj_dir = os.path.join(_root_dir, 'data', 'scan', bone_type_str,
+                           '{}_{}.obj'.format(bone_type_str, str(index)))
 
     logging.info('Loading {0} dataset from {1}'.format(bone_type_str, obj_dir))
-    scan_obj = pywavefront.Wavefront(obj_dir, strict=True, encoding="iso-8859-1", parse=True)
+    scan_obj = pywavefront.Wavefront(
+        obj_dir, strict=True, encoding="iso-8859-1", parse=True)
 
     # Scale unit length to 1 mm(coordinate 1000x)
     vertices = np.asarray(scan_obj.vertices) * 1000
@@ -59,7 +62,8 @@ def process(scan_pcd):
         bone = Bone.Tibia()
 
     # 2. 3D model pre-processing
-    alpha_shape = image_process.preprocess_bone(scan_pcd, bone_type, show_figure)
+    alpha_shape = image_process.preprocess_bone(
+        scan_pcd, bone_type, show_figure)
     bone.set_alpha_shape(alpha_shape)
 
     # 3 Measurements
@@ -85,4 +89,3 @@ if __name__ == "__main__":
         bones.append(process(scan_pcd))
 
     csv_out_utils.csv_out(bones, bone_type, _user_result_dir)
-
