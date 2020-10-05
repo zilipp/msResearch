@@ -4,24 +4,21 @@ import numpy
 from matplotlib import pyplot
 
 # self defined functions
-from base import Bone
-from utilities import distance_util
-from utilities import bone_region_util
+from core_alg.base import Bone
+from core_alg.utilities import distance_util
+from core_alg.utilities import bone_region_util
 
 
 def get_hml(alpha_shape):
     (min_x, _min_y, max_x, _max_y) = alpha_shape.exterior.bounds
     hml = max_x - min_x
-
-    logging.info('hml: {0:0.3f}'.format(hml))
     return hml
 
 
 def get_heb(left_bone):
-    (_left_bone_min_x, left_bone_min_y, _left_bone_max_x, left_bone_max_y) = left_bone.exterior.bounds
+    (_left_bone_min_x, left_bone_min_y, _left_bone_max_x,
+     left_bone_max_y) = left_bone.exterior.bounds
     heb = left_bone_max_y - left_bone_min_y
-
-    logging.info('heb: {0:0.3f}'.format(heb))
     return heb
 
 
@@ -34,11 +31,14 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
 
     left_most_idx = [i for i, x_y in enumerate(convex_hull) if x_y[0] == x_min]
     if left_most_idx[1] - left_most_idx[0] == 1:
-        convex_hull = convex_hull[left_most_idx[1]:] + convex_hull[:left_most_idx[0] + 1]
+        convex_hull = convex_hull[left_most_idx[1]
+            :] + convex_hull[:left_most_idx[0] + 1]
 
     up_most_idx = [i for i, x_y in enumerate(convex_hull) if x_y[1] == y_max]
-    right_most_idx = [i for i, x_y in enumerate(convex_hull) if x_y[0] == x_max]
-    bottom_most_idx = [i for i, x_y in enumerate(convex_hull) if x_y[1] == y_min]
+    right_most_idx = [i for i, x_y in enumerate(
+        convex_hull) if x_y[0] == x_max]
+    bottom_most_idx = [i for i, x_y in enumerate(
+        convex_hull) if x_y[1] == y_min]
 
     # Find point a and point b to get the upper point c
     y_delta_max = 0
@@ -51,8 +51,10 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
     point_a = convex_hull[upper_point_a_idx]
     point_b = convex_hull[upper_point_a_idx+1]
 
-    point_a_idx = [i for i, x_y in enumerate(right_region_points_ordered) if x_y[0] == point_a[0]]
-    point_b_idx = [i for i, x_y in enumerate(right_region_points_ordered) if x_y[0] == point_b[0]]
+    point_a_idx = [i for i, x_y in enumerate(
+        right_region_points_ordered) if x_y[0] == point_a[0]]
+    point_b_idx = [i for i, x_y in enumerate(
+        right_region_points_ordered) if x_y[0] == point_b[0]]
 
     max_dist = 0
     point_c_idx = 0
@@ -62,7 +64,8 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
         for i in range(point_a_idx[0], point_b_idx[0] - 2):
             dist = 0
             for j in range(0, 3):
-                dist = dist + distance_util.distance_point_to_line(point_a, point_b, right_region_points_ordered[i+j])
+                dist = dist + distance_util.distance_point_to_line(
+                    point_a, point_b, right_region_points_ordered[i+j])
             if dist > max_dist:
                 max_dist = dist
                 point_c_idx = i + 1
@@ -96,7 +99,6 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
         pyplot.show()
 
     hhd = distance_util.distance_point_to_point(point_c, point_d)
-    logging.info('hhd: {0:0.3f}'.format(hhd))
     return hhd
 
 
@@ -104,8 +106,10 @@ def get_measurement(humerus, show_figure):
     logging.info('Start measuring humerus...')
 
     left_region, _ = bone_region_util.get_left_region(humerus.alpha_shape)
-    right_region, right_region_points_ordered = bone_region_util.get_right_region(humerus.alpha_shape)
+    right_region, right_region_points_ordered = bone_region_util.get_right_region(
+        humerus.alpha_shape)
 
     humerus.hml = get_hml(humerus.alpha_shape)
     humerus.heb = get_heb(left_region)
-    humerus.hhd = get_hhd(right_region, right_region_points_ordered, show_figure)
+    humerus.hhd = get_hhd(
+        right_region, right_region_points_ordered, show_figure)
