@@ -10,19 +10,19 @@ from logging import handlers
 from pathlib import Path
 
 # self defined functions
-from base import Bone
-from scan import image_process
-from utilities import logging_utils
-from utilities import csv_out_utils
+from core_alg.base import Bone
+from core_alg.scan import image_process
+from core_alg.utilities import logging_utils
+from core_alg.utilities import csv_out_utils
 
 # global variables
 # logging file info
-_root_dir = Path(os.path.dirname(
-    os.path.abspath(__file__))).parent.parent.parent
+_out_root_dir = Path(os.path.dirname(os.path.abspath(__file__)))
+_root_dir = _out_root_dir.parent
 # user log directory
 _user_logs_file = os.path.join(
-    _root_dir, 'python\\out\\logs\\user_logs', 'logs.txt')
-_user_result_dir = os.path.join(_root_dir, 'python\\out\\results')
+    _out_root_dir, 'out', 'core_alg', 'logs', 'logs.txt')
+_user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 # process more files
 multi_files = True
 index_default = 4
@@ -34,7 +34,7 @@ bone_type = Bone.Type.RADIUS
 def load_file(index=index_default):
     bone_type_str = bone_type.name.lower()
     obj_dir = os.path.join(_root_dir, 'data', 'picture', bone_type_str,
-                           '{}_{}.obj'.format(bone_type_str, str(index)))
+                           '{}_one_{}.obj'.format(bone_type_str, str(index)))
 
     logging.info('Loading {0} dataset from {1}'.format(bone_type_str, obj_dir))
     scan_obj = pywavefront.Wavefront(
