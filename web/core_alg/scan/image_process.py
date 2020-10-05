@@ -50,13 +50,11 @@ def mesh_to_points_cloud(scan_obj):
 
     # todo: check for randomness
     scan_pcd2 = scan_obj.sample_points_uniformly(number_of_points*2)
-    scan_pcd1_points = np.asarray(scan_pcd1.points)
-    scan_pcd2_points = np.asarray(scan_pcd2.points)
 
     return scan_pcd1
 
 
-def remove_background(scan_pcd, bone_type):
+def remove_background(scan_pcd, bone_type, show_figure):
     # find plane using RANSAC: plane function: ax + by + cz + d = 0
     # todo: check for randomness
     plane_model, inliers = None, None
@@ -82,12 +80,14 @@ def remove_background(scan_pcd, bone_type):
 
     # bone
     bone_cloud = scan_pcd.select_by_index(inliers, invert=True)
+    # show image without background
+    if show_figure:
+        o3d.visualization.draw_geometries([bone_cloud], mesh_show_wireframe=True)
     return bone_cloud, plane
 
 
 def remove_noise_points(bone_cloud, bone_type, show_figure):
     cl, ind = None, None
-    # todo: check for randomness
     if bone_type == Bone.Type.HUMERUS:
         cl, ind = bone_cloud.remove_statistical_outlier(nb_neighbors=nb_neighbors_humerus,
                                                         std_ratio=std_ratio_humerus)
@@ -252,13 +252,10 @@ def preprocess_bone(scan_pcd, bone_type, show_figure):
     # scan_pcd = mesh_to_points_cloud(scan_pcd)
 
     # 3. Remove background
-    bone_cloud, plane = remove_background(scan_pcd, bone_type)
-    bone_cloud1, plane1 = remove_background(scan_pcd, bone_type)
-    bone_cloud2, plane2 = remove_background(scan_pcd, bone_type)
+    bone_cloud, plane = remove_background(scan_pcd, bone_type, show_figure)
 
     # 4. Remove noise points
     bone_cloud = remove_noise_points(bone_cloud, bone_type, show_figure)
-    bone_cloud1 = remove_noise_points(bone_cloud, bone_type, show_figure)
 
     # 5. Project points to plane
     bone_pcd = project_points_to_plane(bone_cloud, plane, show_figure)

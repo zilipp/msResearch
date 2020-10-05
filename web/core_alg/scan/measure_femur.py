@@ -17,22 +17,73 @@ fmld_coeff = 0.958
 fhd_coeff = 0.971
 
 
-def get_fml(alpha_shape):
+def get_fml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
     fml = max_x - min_x
+
+    if show_figure:
+        # most left point, 1st POIs
+        p_left = []
+        for i in range(len(left_bone_points_ordered)):
+            if left_bone_points_ordered[i][0] == min_x:
+                p_left = left_bone_points_ordered[i]
+                break
+
+        # most right point, 2nd POIs
+        p_right = []
+        right_most_idx = 0
+        for i in range(len(right_bone_points_ordered)):
+            if right_bone_points_ordered[i][0] == max_x:
+                p_right = right_bone_points_ordered[i]
+                break
+
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax = fig.add_subplot(111)
+        ax.plot(x, y)
+        ax.plot(p_left[0], p_left[1], 'r+')
+        ax.plot(p_right[0], p_right[1], 'r+')
+        ax.set_aspect('equal')
+        plt.show()
+
     # fml /= fml_coeff
     return fml
 
 
-def get_feb(left_bone):
+def get_feb(left_bone, left_bone_points_ordered, show_figure, alpha_shape):
     (left_bone_min_x, left_bone_min_y, left_bone_max_x,
      left_bone_max_y) = left_bone.exterior.bounds
     feb = left_bone_max_y - left_bone_min_y
+
+    if show_figure:
+        # top point, 1st POIs
+        p_top = []
+        for i in range(len(left_bone_points_ordered)):
+            if left_bone_points_ordered[i][1] == left_bone_max_y:
+                p_top = left_bone_points_ordered[i]
+                break
+
+        # bottom point, 1st POIs
+        p_bottom = []
+        for i in range(len(left_bone_points_ordered)):
+            if left_bone_points_ordered[i][1] == left_bone_min_y:
+                p_bottom = left_bone_points_ordered[i]
+                break
+
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax = fig.add_subplot(111)
+        ax.plot(x, y)
+        ax.plot(p_top[0], p_top[1], 'r+')
+        ax.plot(p_bottom[0], p_bottom[1], 'r+')
+        ax.set_aspect('equal')
+        plt.show()
+
     # feb /= feb_coeff
     return feb
 
 
-def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
+def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered, show_figure, alpha_shape):
     (left_bone_min_x, left_bone_min_y, left_bone_max_x,
      left_bone_max_y) = left_bone.exterior.bounds
 
@@ -66,18 +117,33 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered):
 
     # 2nd POI
     p_left_second = x_min_point
-    # print('p_left_second: ', p_left_second)
 
+    # 2rd POI
+    p_third = None
     fbml = 0
     for i in range(len(right_bone_points_ordered)):
-        fbml = max(fbml, distance_util.distance_point_to_line(
-            p_left, p_left_second, right_bone_points_ordered[i]))
+        dis_cur = distance_util.distance_point_to_line(
+            p_left, p_left_second, right_bone_points_ordered[i])
+        if dis_cur > fbml:
+            fbml = dis_cur
+            p_third = right_bone_points_ordered[i]
+
+    if show_figure:
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax = fig.add_subplot(111)
+        ax.plot(x, y)
+        ax.plot(p_left[0], p_left[1], 'r+')
+        ax.plot(p_left_second[0], p_left_second[1], 'r+')
+        ax.plot(p_third[0], p_third[1], 'r+')
+        ax.set_aspect('equal')
+        plt.show()
 
     # fbml /= fbml_coeff
     return fbml
 
 
-def get_fmld(center_bone_points, show_figure):
+def get_fmld(center_bone_points, show_figure, alpha_shape):
     center_bone_points = np.asarray(center_bone_points)
     # sort upper and lower points in order by x-value
     center_bone_points_upper = np.asarray(
@@ -97,12 +163,17 @@ def get_fmld(center_bone_points, show_figure):
     # print(top_line_p, bottom_line_p)
 
     if show_figure:
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax = fig.add_subplot(111)
+        ax.plot(x, y)
         x = np.linspace(-25, 25, num=100)
         a = top_line_p[2] * x * x + top_line_p[1] * x + top_line_p[0]
         b = bottom_line_p[2] * x * x + bottom_line_p[1] * x + bottom_line_p[0]
-        plt.plot(x, a, 'r')  # plotting t, a separately
-        plt.plot(x, b, 'b')  # plotting t, b separately
-        plt.plot([0], [0], '*')  # plotting t, c separately
+        ax.plot(x, a, 'r')  # plotting t, a separately
+        ax.plot(x, b, 'r')  # plotting t, b separately
+        ax.plot([0], [0], 'r*')  # plotting t, c separately
+        ax.set_aspect('equal')
         plt.show()
 
     # vertical line
@@ -133,7 +204,7 @@ def get_fmld(center_bone_points, show_figure):
     return fmld
 
 
-def get_fhd(right_bone, right_bone_points_ordered):
+def get_fhd(right_bone, right_bone_points_ordered, show_figure, alpha_shape):
     # 1. right_bone_points_ordered: start from left-upper point
 
     # 2. point with most right s-coorinate: max(x)
@@ -223,6 +294,8 @@ def get_fhd(right_bone, right_bone_points_ordered):
         return res_point
 
     iterate_idx = start_idx
+    first_poi = []
+    second_poi = []
     while iterate_idx > 0:
         p_up_right = right_bone_points_ordered[iterate_idx]
 
@@ -230,14 +303,29 @@ def get_fhd(right_bone, right_bone_points_ordered):
             p_up_right, p_start_2_idx, right_bone_points_ordered)
         cur_fhd = distance_util.distance_point_to_point(
             p_up_right, p_down_left)
-        fhd = max(fhd, cur_fhd)
+        if cur_fhd > fhd:
+            fhd = cur_fhd
+            first_poi = p_down_left
+            second_poi = p_up_right
+
         if cur_fhd < fhd:
             count_decrease += 1
             if count_decrease >= 5:
+
                 break
         else:
             count_decrease = 0
         iterate_idx -= 1
+
+    if show_figure:
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax = fig.add_subplot(111)
+        ax.plot(x, y)
+        ax.plot(first_poi[0], first_poi[1], 'r+')
+        ax.plot(second_poi[0], second_poi[1], 'r+')
+        ax.set_aspect('equal')
+        plt.show()
 
     # fhd /= fhd_coeff
     logging.info('fhd: {0:0.3f}'.format(fhd))
@@ -254,9 +342,9 @@ def get_measurement(femur, show_figure):
     right_region, right_region_points_ordered = bone_region_util.get_right_region(
         femur.alpha_shape)
 
-    femur.fml = get_fml(femur.alpha_shape)
-    femur.feb = get_feb(left_region)
+    femur.fml = get_fml(femur.alpha_shape, show_figure, left_region_points_ordered, right_region_points_ordered)
+    femur.feb = get_feb(left_region, left_region_points_ordered, show_figure, femur.alpha_shape)
     femur.fbml = get_fbml(
-        left_region, left_region_points_ordered, right_region_points_ordered)
-    femur.fmld = get_fmld(center_region_points, show_figure)
-    femur.fhd = get_fhd(right_region, right_region_points_ordered)
+        left_region, left_region_points_ordered, right_region_points_ordered, show_figure, femur.alpha_shape)
+    femur.fmld = get_fmld(center_region_points, show_figure, femur.alpha_shape)
+    femur.fhd = get_fhd(right_region, right_region_points_ordered, show_figure, femur.alpha_shape)
