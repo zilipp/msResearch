@@ -10,20 +10,20 @@ from logging import handlers
 from pathlib import Path
 
 # self defined functions
-from base import Bone
-from scan import image_process
-from utilities import logging_utils
-from utilities import csv_out_utils
+from core_alg.base import Bone
+from core_alg.scan import image_process
+from core_alg.utilities import logging_utils
+from core_alg.utilities import csv_out_utils
 
 # global variables
 # logging file info
-_root_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.parent
+_out_root_dir = Path(os.path.dirname(
+    os.path.abspath(__file__))).parent
+_root_dir = _out_root_dir.parent
 # user log directory
 _user_logs_file = os.path.join(
-    _root_dir, 'out\\core_alg\\logs\\user_logs', 'logs.txt')
-_user_result_dir = os.path.join(_root_dir, 'out\\core_alg\\results')
-# process more files
-multi_files = True
+    _out_root_dir, 'out', 'core_alg', 'logs', 'logs.txt')
+_user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 index_default = 4
 # switch for figure
 show_figure = False
@@ -75,17 +75,11 @@ def process(scan_pcd):
     return bone
 
 
-if __name__ == "__main__":
+def compute():
     logging_utils.init_logger(_user_logs_file)
-
     bones = list()
-    if multi_files:
-        for i in range(9):
-            # 1. Load file
-            scan_pcd = load_file(i)
-            bones.append(process(scan_pcd))
-    else:
-        scan_pcd = load_file()
-        bones.append(process(scan_pcd))
-
+    scan_pcd = load_file()
+    bones.append(process(scan_pcd))
     csv_out_utils.csv_out(bones, bone_type, _user_result_dir)
+
+    return str(bones[0].get_measurement_results())

@@ -10,9 +10,9 @@ from matplotlib import pyplot as plt
 import random
 
 # self defined functions
-from base import Bone
-from utilities import distance_util
-from utilities import visualization_util
+from core_alg.base import Bone
+from core_alg.utilities import distance_util
+from core_alg.utilities import visualization_util
 
 # random.seed(1)
 

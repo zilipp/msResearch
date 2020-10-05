@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import numpy.polynomial.polynomial as poly
 
 # self defined functions
-from base import Bone
-from utilities import distance_util
-from utilities import bone_region_util
+from core_alg.base import Bone
+from core_alg.utilities import distance_util
+from core_alg.utilities import bone_region_util
 
 # parameter to tune error
 rml_coeff = 0.996
@@ -19,21 +19,25 @@ def get_rml(alpha_shape):
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
     rml = max_x - min_x
     rml /= rml_coeff
-    logging.info('rml: {0:0.3f}'.format(rml))
     return rml
 
 
 def get_rmld(center_bone_points, show_figure):
     center_bone_points = np.asarray(center_bone_points)
-    center_bone_points_upper = np.asarray([x for x in center_bone_points if x[1] >= 0])
-    center_bone_points_upper = center_bone_points_upper[np.argsort(center_bone_points_upper[:, 0])]
+    center_bone_points_upper = np.asarray(
+        [x for x in center_bone_points if x[1] >= 0])
+    center_bone_points_upper = center_bone_points_upper[np.argsort(
+        center_bone_points_upper[:, 0])]
 
-    center_bone_points_lower = np.asarray([x for x in center_bone_points if x[1] <= 0])
-    center_bone_points_lower = center_bone_points_lower[np.argsort(center_bone_points_lower[:, 0])]
+    center_bone_points_lower = np.asarray(
+        [x for x in center_bone_points if x[1] <= 0])
+    center_bone_points_lower = center_bone_points_lower[np.argsort(
+        center_bone_points_lower[:, 0])]
 
     # fit two lines
     top_line_p = distance_util.fit_line(center_bone_points_upper, show_figure)
-    bottom_line_p = distance_util.fit_line(center_bone_points_lower, show_figure)
+    bottom_line_p = distance_util.fit_line(
+        center_bone_points_lower, show_figure)
 
     if show_figure:
         x = np.linspace(-25, 25, num=100)
@@ -42,11 +46,15 @@ def get_rmld(center_bone_points, show_figure):
         plt.plot(x, a, 'r')  # plotting t, a separately
         plt.plot(x, b, 'b')  # plotting t, b separately
 
-        plt.scatter(center_bone_points_upper[:, 0], center_bone_points_upper[:, 1])
-        plt.scatter(center_bone_points_lower[:, 0], center_bone_points_lower[:, 1])
+        plt.scatter(
+            center_bone_points_upper[:, 0], center_bone_points_upper[:, 1])
+        plt.scatter(
+            center_bone_points_lower[:, 0], center_bone_points_lower[:, 1])
 
-        plt.scatter(center_bone_points_upper[:, 0], center_bone_points_upper[:, 1], marker='+')
-        plt.scatter(center_bone_points_lower[:, 0], center_bone_points_lower[:, 1],  marker='+')
+        plt.scatter(
+            center_bone_points_upper[:, 0], center_bone_points_upper[:, 1], marker='+')
+        plt.scatter(
+            center_bone_points_lower[:, 0], center_bone_points_lower[:, 1],  marker='+')
 
         plt.plot([0], [0], '*')  # plotting t, c separately
         plt.show()
@@ -75,14 +83,14 @@ def get_rmld(center_bone_points, show_figure):
     #
     # rmld = math.sqrt(min_line_segment_length)
     rmld /= rmld_coeff
-    logging.info('rmld: {0:0.3f}'.format(rmld))
     return rmld
 
 
 def get_measurement(radius, show_figure):
     logging.info('Start measuring radius...')
 
-    center_region, center_region_points = bone_region_util.get_center_region(radius.alpha_shape)
+    center_region, center_region_points = bone_region_util.get_center_region(
+        radius.alpha_shape)
 
     radius.rml = get_rml(radius.alpha_shape)
     radius.rmld = get_rmld(center_region_points, show_figure)
