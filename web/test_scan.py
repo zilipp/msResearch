@@ -25,11 +25,11 @@ _user_logs_file = os.path.join(
     _out_root_dir, 'out', 'core_alg', 'logs', 'logs.txt')
 _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 # process more files
-multi_files = True
-index_default = 4
+multi_files = False
+index_default = 1
 # switch for figure
-show_figure = False
-bone_type = Bone.Type.RADIUS
+show_figure = True
+bone_type = Bone.Type.FEMUR
 
 
 def load_file(index=index_default):
