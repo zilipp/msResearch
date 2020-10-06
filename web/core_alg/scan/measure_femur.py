@@ -39,7 +39,6 @@ def get_fml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
 
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
-        ax = fig.add_subplot(111)
         ax.plot(x, y)
         ax.plot(p_left[0], p_left[1], 'r+')
         ax.plot(p_right[0], p_right[1], 'r+')
@@ -72,7 +71,6 @@ def get_feb(left_bone, left_bone_points_ordered, show_figure, alpha_shape):
 
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
-        ax = fig.add_subplot(111)
         ax.plot(x, y)
         ax.plot(p_top[0], p_top[1], 'r+')
         ax.plot(p_bottom[0], p_bottom[1], 'r+')
@@ -131,7 +129,6 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered, sho
     if show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
-        ax = fig.add_subplot(111)
         ax.plot(x, y)
         ax.plot(p_left[0], p_left[1], 'r+')
         ax.plot(p_left_second[0], p_left_second[1], 'r+')
@@ -165,7 +162,6 @@ def get_fmld(center_bone_points, show_figure, alpha_shape):
     if show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
-        ax = fig.add_subplot(111)
         ax.plot(x, y)
         x = np.linspace(-25, 25, num=100)
         a = top_line_p[2] * x * x + top_line_p[1] * x + top_line_p[0]
@@ -320,7 +316,6 @@ def get_fhd(right_bone, right_bone_points_ordered, show_figure, alpha_shape):
     if show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
-        ax = fig.add_subplot(111)
         ax.plot(x, y)
         ax.plot(first_poi[0], first_poi[1], 'r+')
         ax.plot(second_poi[0], second_poi[1], 'r+')

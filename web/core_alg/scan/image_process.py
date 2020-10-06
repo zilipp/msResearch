@@ -235,7 +235,6 @@ def get_alpha_shape(points, bone_type, show_figure):
     if show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
-        ax = fig.add_subplot(111)
         ax.plot(x, y)
         ax.set_aspect('equal')
         plt.show()

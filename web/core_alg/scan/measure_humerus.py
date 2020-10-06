@@ -2,6 +2,7 @@
 import logging
 import numpy
 from matplotlib import pyplot
+import matplotlib.pyplot as plt
 
 # self defined functions
 from core_alg.base import Bone
@@ -9,20 +10,69 @@ from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
 
 
-def get_hml(alpha_shape):
+def get_hml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, _min_y, max_x, _max_y) = alpha_shape.exterior.bounds
     hml = max_x - min_x
+
+    if show_figure:
+        # most left point, 1st POIs
+        p_left = []
+        for i in range(len(left_bone_points_ordered)):
+            if left_bone_points_ordered[i][0] == min_x:
+                p_left = left_bone_points_ordered[i]
+                break
+
+        # most right point, 2nd POIs
+        p_right = []
+        right_most_idx = 0
+        for i in range(len(right_bone_points_ordered)):
+            if right_bone_points_ordered[i][0] == max_x:
+                p_right = right_bone_points_ordered[i]
+                break
+
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax.plot(x, y)
+        ax.plot(p_left[0], p_left[1], 'r+')
+        ax.plot(p_right[0], p_right[1], 'r+')
+        ax.set_aspect('equal')
+        plt.show()
+
     return hml
 
 
-def get_heb(left_bone):
+def get_heb(left_bone, show_figure, left_bone_points_ordered, alpha_shape):
     (_left_bone_min_x, left_bone_min_y, _left_bone_max_x,
      left_bone_max_y) = left_bone.exterior.bounds
     heb = left_bone_max_y - left_bone_min_y
+
+    if show_figure:
+        # top point, 1st POIs
+        p_top = []
+        for i in range(len(left_bone_points_ordered)):
+            if left_bone_points_ordered[i][1] == left_bone_max_y:
+                p_top = left_bone_points_ordered[i]
+                break
+
+        # bottom point, 1st POIs
+        p_bottom = []
+        for i in range(len(left_bone_points_ordered)):
+            if left_bone_points_ordered[i][1] == left_bone_min_y:
+                p_bottom = left_bone_points_ordered[i]
+                break
+
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax.plot(x, y)
+        ax.plot(p_top[0], p_top[1], 'r+')
+        ax.plot(p_bottom[0], p_bottom[1], 'r+')
+        ax.set_aspect('equal')
+        plt.show()
+
     return heb
 
 
-def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
+def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_shape):
     (x_min, y_min, x_max, y_max) = bone_right_region.exterior.bounds
 
     convex_hull = list()
@@ -83,20 +133,39 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
     point_d = convex_hull[point_d_idx]
 
     if show_figure:
-        data = numpy.array(right_region_points_ordered)
-        x, y = data.T
-        pyplot.scatter(x, y, marker='o')
+        fig, ax = plt.subplots()
 
-        data = numpy.array(convex_hull)
-        x, y = data.T
-        pyplot.scatter(x, y, marker='*')
+        data = numpy.asarray(right_region_points_ordered)
+        x = data[:, 0].tolist()
+        y = data[:, 1].tolist()
+        ax.scatter(x, y, marker='o')
 
-        data = numpy.array([point_a, point_b, point_c, point_d])
-        x, y = data.T
-        pyplot.scatter(x, y, marker='+')
+        data = numpy.asarray(convex_hull)
+        x = data[:, 0].tolist()
+        y = data[:, 1].tolist()
+        ax.scatter(x, y, marker='*', facecolor='g')
 
-        pyplot.axis('equal')
-        pyplot.show()
+        data = numpy.asarray([point_a, point_b])
+        x = data[:, 0].tolist()
+        y = data[:, 1].tolist()
+        ax.scatter(x, y, marker='+', facecolor='orange')
+
+        data = numpy.asarray([point_c, point_d])
+        x = data[:, 0].tolist()
+        y = data[:, 1].tolist()
+        ax.scatter(x, y, marker='+', facecolor='r')
+
+        ax.set_aspect('equal')
+        plt.show()
+
+    if show_figure:
+        fig, ax = plt.subplots()
+        x, y = alpha_shape.exterior.xy
+        ax.plot(x, y)
+        ax.plot(point_c[0], point_c[1], 'r+')
+        ax.plot(point_d[0], point_d[1], 'r+')
+        ax.set_aspect('equal')
+        plt.show()
 
     hhd = distance_util.distance_point_to_point(point_c, point_d)
     return hhd
@@ -105,11 +174,11 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure):
 def get_measurement(humerus, show_figure):
     logging.info('Start measuring humerus...')
 
-    left_region, _ = bone_region_util.get_left_region(humerus.alpha_shape)
+    left_region, left_region_points_ordered = bone_region_util.get_left_region(humerus.alpha_shape)
     right_region, right_region_points_ordered = bone_region_util.get_right_region(
         humerus.alpha_shape)
 
-    humerus.hml = get_hml(humerus.alpha_shape)
-    humerus.heb = get_heb(left_region)
+    humerus.hml = get_hml(humerus.alpha_shape, show_figure, left_region_points_ordered, right_region_points_ordered)
+    humerus.heb = get_heb(left_region, show_figure, left_region_points_ordered, humerus.alpha_shape)
     humerus.hhd = get_hhd(
-        right_region, right_region_points_ordered, show_figure)
+        right_region, right_region_points_ordered, show_figure, humerus.alpha_shape)
