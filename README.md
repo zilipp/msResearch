@@ -14,18 +14,24 @@ The structure of the project is as following:
 +-- .gitignore
 ```
 
-In /ios \
-/native_app: it contains the application works in ios mobile device \
+In /ios 
+
+/native_app: it contains the application works in ios mobile device 
+
 /structure_sensor_sdk: the SDK of structure sensor Scanner 
 
-In /web \
-/analysis: web service in Django \ 
+In /web 
+
+/analysis: web service in Django 
+
 /core_alg: core algorithms for bone measurements 
 
-Data can be obtained from: \
+Data can be obtained from: 
+
 https://drive.google.com/drive/folders/1UpFqdTYEeKpiWvTvGRh0lItcKqYEDipQ?usp=sharing
 
-Report can be obtained from: \
+Report can be obtained from: 
+
 https://drive.google.com/drive/folders/12TX--8sONiThB2JGfjid0tvrq0stinot?usp=sharing
 
 
