@@ -41,7 +41,6 @@ def get_rml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
         ax.set_aspect('equal')
         plt.show()
 
-
     rml /= rml_coeff
     return rml
 

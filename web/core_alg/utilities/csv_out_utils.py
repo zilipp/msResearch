@@ -26,3 +26,4 @@ def csv_out(bones, bone_type, _user_result_dir):
         line = ','.join(row)
         f.write(line+'\n')
     f.close()
+    return filename

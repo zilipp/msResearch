@@ -2,11 +2,8 @@
 import logging
 import os
 import open3d as o3d
-import sys
 import pywavefront
 import numpy as np
-
-from logging import handlers
 from pathlib import Path
 
 # self defined functions
@@ -14,6 +11,7 @@ from core_alg.base import Bone
 from core_alg.scan import image_process
 from core_alg.utilities import logging_utils
 from core_alg.utilities import csv_out_utils
+from core_alg.utilities import results_anlysis
 
 # global variables
 # logging file info
@@ -24,11 +22,11 @@ _user_logs_file = os.path.join(
     _out_root_dir, 'out', 'core_alg', 'logs', 'logs.txt')
 _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 # process more files
-multi_files = False
-index_default = 4
+multi_files = True
+index_default = 2
 # switch for figure
-show_figure = True
-bone_type = Bone.Type.FEMUR
+show_figure = False
+bone_type = Bone.Type.TIBIA
 # image from iphone10 or structure sensor
 structure_sensor = True
 
@@ -88,7 +86,7 @@ if __name__ == "__main__":
 
     bones = list()
     if multi_files:
-        for i in range(9):
+        for i in range(8):
             # 1. Load file
             picture_pcd = load_file(i)
             bones.append(process(picture_pcd))
@@ -96,4 +94,10 @@ if __name__ == "__main__":
         picture_pcd = load_file()
         bones.append(process(picture_pcd))
 
-    csv_out_utils.csv_out(bones, bone_type, _user_result_dir)
+    if multi_files:
+        logging.info("writing results to csv file in output folder...")
+        filename = csv_out_utils.csv_out(bones, bone_type, _user_result_dir)
+
+        logging.info("analysing the results for multi-bones, last four rows are: "
+                     "abs_avg_res, abs_std_res, scale_avg_res, scale_std_res")
+        results_anlysis.analysis_csv(filename, bone_type)
