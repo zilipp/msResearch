@@ -17,18 +17,17 @@ from core_alg.utilities import csv_out_utils
 
 # global variables
 # logging file info
-_out_root_dir = Path(os.path.dirname(
-    os.path.abspath(__file__)))
+_out_root_dir = Path(os.path.dirname(os.path.abspath(__file__)))
 _root_dir = _out_root_dir.parent
 # user log directory
 _user_logs_file = os.path.join(
     _out_root_dir, 'out', 'core_alg', 'logs', 'logs.txt')
 _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 # process more files
-multi_files = False
+multi_files = True
 index_default = 1
 # switch for figure
-show_figure = True
+show_figure = False
 bone_type = Bone.Type.FEMUR
 
 

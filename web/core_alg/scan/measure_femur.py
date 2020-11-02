@@ -45,7 +45,7 @@ def get_fml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
         ax.set_aspect('equal')
         plt.show()
 
-    # fml /= fml_coeff
+    fml /= fml_coeff
     return fml
 
 
@@ -77,7 +77,7 @@ def get_feb(left_bone, left_bone_points_ordered, show_figure, alpha_shape):
         ax.set_aspect('equal')
         plt.show()
 
-    # feb /= feb_coeff
+    feb /= feb_coeff
     return feb
 
 
@@ -136,7 +136,7 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered, sho
         ax.set_aspect('equal')
         plt.show()
 
-    # fbml /= fbml_coeff
+    fbml /= fbml_coeff
     return fbml
 
 
@@ -196,7 +196,7 @@ def get_fmld(center_bone_points, show_figure, alpha_shape):
         min_line_segment_length = min(dis_cur, min_line_segment_length)
 
     fmld = math.sqrt(min_line_segment_length)
-    # fmld /= fmld_coeff
+    fmld /= fmld_coeff
     return fmld
 
 
@@ -322,7 +322,7 @@ def get_fhd(right_bone, right_bone_points_ordered, show_figure, alpha_shape):
         ax.set_aspect('equal')
         plt.show()
 
-    # fhd /= fhd_coeff
+    fhd /= fhd_coeff
     logging.info('fhd: {0:0.3f}'.format(fhd))
     return fhd
 
