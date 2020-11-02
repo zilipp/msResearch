@@ -2,11 +2,8 @@
 import logging
 import os
 import open3d as o3d
-import sys
 import pywavefront
 import numpy as np
-
-from logging import handlers
 from pathlib import Path
 
 # self defined functions
@@ -14,6 +11,7 @@ from core_alg.base import Bone
 from core_alg.scan import image_process
 from core_alg.utilities import logging_utils
 from core_alg.utilities import csv_out_utils
+from core_alg.utilities import results_anlysis
 
 # global variables
 # logging file info
@@ -28,7 +26,7 @@ multi_files = True
 index_default = 1
 # switch for figure
 show_figure = False
-bone_type = Bone.Type.FEMUR
+bone_type = Bone.Type.HUMERUS
 
 
 def load_file(index=index_default):
@@ -89,4 +87,10 @@ if __name__ == "__main__":
         scan_pcd = load_file()
         bones.append(process(scan_pcd))
 
-    csv_out_utils.csv_out(bones, bone_type, _user_result_dir)
+    logging.info("writing results to csv file in output folder...")
+    filename = csv_out_utils.csv_out(bones, bone_type, _user_result_dir)
+
+    if multi_files:
+        logging.info("analysing the results for multi-bones, last four rows are: "
+                     "abs_avg_res, abs_std_res, scale_avg_res, scale_std_res")
+        results_anlysis.analysis_csv(filename, bone_type)

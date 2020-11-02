@@ -9,6 +9,11 @@ from core_alg.base import Bone
 from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
 
+# parameter to tune error
+hml_coeff = 0.996
+heb_coeff = 0.994
+hhd_coeff = 0.965
+
 
 def get_hml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, _min_y, max_x, _max_y) = alpha_shape.exterior.bounds
@@ -38,6 +43,7 @@ def get_hml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
         ax.set_aspect('equal')
         plt.show()
 
+    hml /= hml_coeff
     return hml
 
 
@@ -69,6 +75,7 @@ def get_heb(left_bone, show_figure, left_bone_points_ordered, alpha_shape):
         ax.set_aspect('equal')
         plt.show()
 
+    heb /= heb_coeff
     return heb
 
 
@@ -168,6 +175,7 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
         plt.show()
 
     hhd = distance_util.distance_point_to_point(point_c, point_d)
+    hhd /= hhd_coeff
     return hhd
 
 
