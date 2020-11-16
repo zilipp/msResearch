@@ -22,16 +22,22 @@ _user_logs_file = os.path.join(
     _out_root_dir, 'out', 'core_alg', 'logs', 'logs.txt')
 _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 # process more files
-multi_files = True
-index_default = 1
+multi_files = False
+index_default = 0
 # switch for figure
-show_figure = False
-bone_type = Bone.Type.HUMERUS
+show_figure = True
+bone_type = Bone.Type.RADIUS
+# switch for structure sensor or iphone10
+structure_sensor = True
 
 
 def load_file(index=index_default):
     bone_type_str = bone_type.name.lower()
-    obj_dir = os.path.join(_root_dir, 'data', 'scan', bone_type_str,
+    if structure_sensor:
+        device = 'structure_sensor'
+    else:
+        device = 'iphone_ten'
+    obj_dir = os.path.join(_root_dir, 'data', device, 'scan', bone_type_str,
                            '{}_{}.obj'.format(bone_type_str, str(index)))
 
     logging.info('Loading {0} dataset from {1}'.format(bone_type_str, obj_dir))
@@ -40,6 +46,11 @@ def load_file(index=index_default):
 
     # Scale unit length to 1 mm(coordinate 1000x)
     vertices = np.asarray(scan_obj.vertices) * 1000
+
+    if not structure_sensor:
+        # iphone_ten image has color info on "v" line
+        vertices = vertices[:, :3]
+
     scan_pcd = o3d.geometry.PointCloud()
     scan_pcd.points = o3d.utility.Vector3dVector(vertices)
 
