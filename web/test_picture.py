@@ -27,7 +27,7 @@ index_default = 2
 # switch for figure
 show_figure = False
 bone_type = Bone.Type.TIBIA
-# image from iphone10 or structure sensor
+# image from iphone_ten or structure sensor
 structure_sensor = True
 
 
@@ -45,7 +45,7 @@ def load_file(index=index_default):
 
     # Scale unit length to 1 mm(coordinate 1000x)
     vertices = np.asarray(scan_obj.vertices) * 1000
-    # iphone10 image has color info on "v" line
+    # iphone_ten image has color info on "v" line
     vertices = vertices[:, :3]
     picture_pcd = o3d.geometry.PointCloud()
     picture_pcd.points = o3d.utility.Vector3dVector(vertices)
