@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "analysis",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -120,13 +121,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
-
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "measurebone", "site_static")]
 STATIC_ROOT = os.path.join(BASE_DIR, "measurebone", "static")
-STATIC_URL = "/static/"
-# MEDIA_ROOT = os.path.join(BASE_DIR, "drf_and_image_uploads", "media")
+# MEDIA_ROOT = os.path.join(BASE_DIR, "measurebone", "media")
 # MEDIA_URL = "/media/"
 
 # AUTH_USER_MODEL = "accounts.User"
