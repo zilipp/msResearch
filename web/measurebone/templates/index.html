@@ -1,0 +1,32 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>Avatar Upload</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <p class="text-muted my-3"><small>Open Developer Console for information about responses.</small></p>
+            <h1 class="my-3">1. Upload an avatar</h1>
+            <form id="avatar_form">
+                <div class="form-group">
+                    <label for="id_avatar">Choose an bone_model</label>
+                    <input type="file" class="form-control-file" id="id_avatar"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+<script src="{% static 'site/js/avatar.js' %}"></script>
+</body>
+</html>
