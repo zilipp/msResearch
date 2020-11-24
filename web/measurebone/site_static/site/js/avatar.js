@@ -1,7 +1,8 @@
-let userToken;
-
 document.getElementById('avatar_form').addEventListener('submit', function(event) {
-    event.preventDefault(); ``
+    event.preventDefault();
+    document.getElementById("myBtn").disabled = true;
+    document.querySelector('#result_label').innerHTML = "Results";
+    document.querySelector('#result_span').textContent = "processing...";
     let input = document.getElementById('id_avatar');
 
     let data = new FormData();
@@ -18,6 +19,8 @@ document.getElementById('avatar_form').addEventListener('submit', function(event
         return response.json();
     }).then(data => {
         console.log(data);
+        document.querySelector('#result_span').textContent = data.results;
+        document.getElementById("myBtn").disabled = false;
     }).catch((error) => {
         console.error('Error:', error);
     });
