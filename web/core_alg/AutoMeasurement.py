@@ -1,5 +1,6 @@
 # python libraries
 from django.http import JsonResponse
+import json
 import logging
 import numpy as np
 import os
@@ -79,7 +80,16 @@ class AutoMeasurement(object):
 
     def compute(self, request):
         # get bone type from request
-        self.bone_type = Bone.Type.FEMUR
+        bone_type = request.POST.get('bone_type', 'Femur')
+
+        if bone_type == "Femur":
+            self.bone_type = Bone.Type.FEMUR
+        elif bone_type == "Humerus":
+            self.bone_type = Bone.Type.HUMERUS
+        elif bone_type == "Tibia":
+            self.bone_type = Bone.Type.TIBIA
+        else:
+            self.bone_type = Bone.Type.RADIUS
 
         # take measurement
         scan_pcd = self.load_file()

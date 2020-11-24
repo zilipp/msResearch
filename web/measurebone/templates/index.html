@@ -10,20 +10,41 @@
     <link rel="icon" type="image/png" href="https://bitbucket-assetroot.s3.amazonaws.com/c/photos/2013/Aug/13/CVLabUCSC-avatar-3822751541-1_avatar.png"/>
     <title>Bone Model Analysis</title>
 </head>
-<body>
+<body class="bg-light">
 <div class="container">
+    <div class="py-5 text-center">
+        <img class="d-block mx-auto mb-4" src="https://bitbucket-assetroot.s3.amazonaws.com/c/photos/2013/Aug/13/CVLabUCSC-avatar-3822751541-1_avatar.png" alt="" width="72" height="72">
+        <h2>Bone Measurement</h2>
+        <p class="lead">This is an automatic tool for long bone measurement.</p>
+    </div>
+
     <div class="row">
-        <div class="col-md-8">
-            <p class="text-muted my-3"><small>Open Developer Console for information about responses.</small></p>
-            <h1 class="my-3">Upload a bone model</h1>
+        <div class="col">
             <form id="avatar_form">
                 <div class="form-group">
-                    <label for="id_avatar">Choose an bone_model</label>
-                    <input type="file" class="form-control-file" id="id_avatar"/>
+                    <label for="id_obj">Choose a bone_model (*.obj)</label>
+                    <input type="file" class="form-control-file" id="id_obj"/>
                 </div>
+
+                <div class="form-group">
+                    <label for="id_mtl">Choose a material settings file (Model.mtl)</label>
+                    <input type="file" class="form-control-file" id="id_mtl"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_type">Select a bone type</label>
+                    <select class="form-control" id="id_type">
+                        <option value="" selected disabled hidden>Choose here</option>
+                        <option>Humerus</option>
+                        <option>Radius</option>
+                        <option>Femur</option>
+                        <option>Tibia</option>
+                    </select>
+                </div>
+
                 <button type="submit" class="btn btn-primary" id="myBtn">Upload</button>
                 <div>
-                    <h1 class="my-3" id="result_label"></h1>
+                    <h1 class="my-3" id="result_h1"></h1>
                     <span id="result_span"></span>
                 </div>
             </form>

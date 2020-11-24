@@ -27,16 +27,22 @@ def index(request):
     elif request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_file(request.FILES['file'])
+            logging.info("hhh")
+            handle_uploaded_file(request.FILES['file'], model=True)
+            handle_uploaded_file(request.FILES['mtl'], model=False)
+            # logging.info(request.POST.get('bone_type', 'Humur'))
             result = autoMeasurement.compute(request)
             return result
         else:
             return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
 
-def handle_uploaded_file(f):
+def handle_uploaded_file(f, model):
     logger.error(_cache_dir)
-    cache_file_path = os.path.join(_cache_dir, 'cache.obj')
+    if model:
+        cache_file_path = os.path.join(_cache_dir, 'cache.obj')
+    else:
+        cache_file_path = os.path.join(_cache_dir, 'Model.mtl')
     with open(cache_file_path, 'wb+') as obj_file:
         for chunk in f.chunks():
             obj_file.write(chunk)

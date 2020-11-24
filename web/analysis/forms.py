@@ -2,5 +2,5 @@ from django import forms
 
 
 class UploadFileForm(forms.Form):
-    title = forms.CharField(max_length=50)
+    bone_type = forms.CharField(label='bone_type', max_length=50)
     file = forms.FileField()
