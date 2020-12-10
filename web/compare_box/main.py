@@ -19,13 +19,13 @@ _user_logs_file = os.path.join(
     _root_dir.parent, 'out', 'core_alg', 'logs', 'logs.txt')
 
 # switch for figure
-show_figure = True
+show_figure = False
 # switch for structure sensor or iphone10
 structure_sensor = False
 
 
 # params for remove background
-distance_threshold = 3
+distance_threshold = 1
 ransac_n = 3
 num_iterations = 10000
 
@@ -48,6 +48,7 @@ def load_file(index=0):
     # Scale unit length to 1 mm(coordinate 1000x)
     vertices = np.asarray(scan_obj.vertices) * 1000
 
+
     if not structure_sensor:
         # iphone_ten image has color info on "v" line
         vertices = vertices[:, :3]
@@ -57,7 +58,7 @@ def load_file(index=0):
 
     if show_figure:
         o3d.visualization.draw_geometries([scan_pcd], mesh_show_wireframe=True)
-    return scan_pcd
+    return scan_pcd, vertices.shape[0]
 
 
 def remove_background(scan_pcd, show_figure):
@@ -74,6 +75,7 @@ def remove_background(scan_pcd, show_figure):
 
     # floor
     inlier_cloud = scan_pcd.select_by_index(inliers)
+
     inlier_cloud.paint_uniform_color([1.0, 0, 0])
 
     # bone
@@ -81,7 +83,7 @@ def remove_background(scan_pcd, show_figure):
     # show image without background
     if show_figure:
         o3d.visualization.draw_geometries([obj_cloud], mesh_show_wireframe=True)
-    return obj_cloud, plane
+    return obj_cloud, plane, np.asarray(obj_cloud.points).shape[0]
 
 
 def remove_noise_points(bone_cloud, show_figure):
@@ -99,11 +101,27 @@ def remove_noise_points(bone_cloud, show_figure):
 if __name__ == "__main__":
     logging_utils.init_logger(_user_logs_file)
     logging.info("setup")
-    scan_pcd = load_file()
+    scan_pcd, number_points_all = load_file()
+    print(number_points_all)
 
-    obj_cloud, plane = remove_background(scan_pcd, show_figure)
-    # bone_cloud = remove_noise_points(obj_cloud, show_figure)
-    obj_cloud, plane = remove_background(scan_pcd, show_figure)
+    # number of points in cloud
+
+
+    # ground
+    obj_cloud, plane_g, number_residual_g = remove_background(scan_pcd, show_figure)
+    print("after removing ground", plane_g, number_residual_g)
+
+    # face1
+    obj_cloud, plane_1, number_residual_1 = remove_background(obj_cloud, show_figure)
+    print("after removing one face", plane_1, number_residual_1)
+
+    # face2
+    obj_cloud, plane_2, number_residual_2 = remove_background(obj_cloud, show_figure)
+    print("after removing two faces", plane_2, number_residual_2)
+
+    # numeber_residuals / numeber_input_points
+    print("ratio of residuals / all input points: ", number_residual_2/number_points_all)
+
 
 
 
