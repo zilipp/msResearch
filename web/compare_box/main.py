@@ -1,16 +1,20 @@
 import logging
+import math
+import numpy as np
 import os
 import open3d as o3d
 import pywavefront
-import numpy as np
 from pathlib import Path
 
 # self defined functions
 from core_alg.utilities import logging_utils
 from core_alg.utilities import visualization_util
 
-# global variables
+"""
+This file is a separate file that compare iphone and sensor taking the same picture
+"""
 
+# global variables
 # root directory
 _root_dir = Path(os.path.dirname(os.path.abspath(__file__)))  # compare_box
 
@@ -98,28 +102,44 @@ def remove_noise_points(bone_cloud, show_figure):
     return bone_cloud
 
 
+def angle_of_two_plane(plane_1, plane_2):
+    [a1, b1, c1, d1] = plane_1
+    [a2, b2, c2, d2] = plane_2
+    d = (a1 * a2 + b1 * b2 + c1 * c2)
+    e1 = math.sqrt(a1 * a1 + b1 * b1 + c1 * c1)
+    e2 = math.sqrt(a2 * a2 + b2 * b2 + c2 * c2)
+    d = d / (e1 * e2)
+    A = math.degrees(math.acos(d))
+    return A
+
+
 if __name__ == "__main__":
     logging_utils.init_logger(_user_logs_file)
     logging.info("setup")
+
+    # load file, return pcd and numeber of points
     scan_pcd, number_points_all = load_file()
     print(number_points_all)
 
-    # number of points in cloud
-
-
-    # ground
+    # remove ground
     obj_cloud, plane_g, number_residual_g = remove_background(scan_pcd, show_figure)
     print("after removing ground", plane_g, number_residual_g)
 
-    # face1
+    # remove face1
     obj_cloud, plane_1, number_residual_1 = remove_background(obj_cloud, show_figure)
     print("after removing one face", plane_1, number_residual_1)
 
-    # face2
+    # remove face2
     obj_cloud, plane_2, number_residual_2 = remove_background(obj_cloud, show_figure)
     print("after removing two faces", plane_2, number_residual_2)
 
-    # numeber_residuals / numeber_input_points
+    # 1. angle of two vector
+    angle_two_face = angle_of_two_plane(plane_1, plane_2)
+    print("Angle of two plane is:", angle_two_face, "degree")
+
+    # 2.
+
+    # 3. number_residuals / number_input_points
     print("ratio of residuals / all input points: ", number_residual_2/number_points_all)
 
 
