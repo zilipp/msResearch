@@ -197,15 +197,7 @@ def get_box_length(scan_pcd, obj_cloud, plane_1, plane_2):
     point_in_intersection_pcd.paint_uniform_color([0, 0, 0])
     if show_figure:
         o3d.visualization.draw_geometries([scan_pcd, point_in_intersection_pcd], mesh_show_wireframe=True)
-
-
-
     print(len(point_in_intersection_line))
-
-
-
-
-
 
 
 if __name__ == "__main__":
