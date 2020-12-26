@@ -28,8 +28,7 @@ def index(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             logging.info("hhh")
-            handle_uploaded_file(request.FILES['file'], model=True)
-            handle_uploaded_file(request.FILES['mtl'], model=False)
+            handle_uploaded_file(request.FILES['file'])
             # logging.info(request.POST.get('bone_type', 'Humur'))
             result = autoMeasurement.compute(request)
             return result
@@ -37,12 +36,16 @@ def index(request):
             return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
 
 
-def handle_uploaded_file(f, model):
+def handle_uploaded_file(f):
     logger.error(_cache_dir)
-    if model:
-        cache_file_path = os.path.join(_cache_dir, 'cache.obj')
-    else:
-        cache_file_path = os.path.join(_cache_dir, 'Model.mtl')
+    cache_file_path = os.path.join(_cache_dir, 'cache.obj')
+
     with open(cache_file_path, 'wb+') as obj_file:
         for chunk in f.chunks():
             obj_file.write(chunk)
+
+    # delete mtl file
+    with open(cache_file_path, 'r') as fin:
+        data = fin.read().splitlines(True)
+    with open(cache_file_path, 'w') as fout:
+        fout.writelines(data[2:])

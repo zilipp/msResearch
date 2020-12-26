@@ -9,7 +9,6 @@ document.getElementById('avatar_form').addEventListener('submit', function(event
 
     let data = new FormData();
     data.append('file', input_obj.files[0]);
-    data.append('mtl', input_mtl.files[0]);
     data.append('bone_type', input_type.value);
     data.append('enctype', "multipart/form-data");
     data.append('title', "test.txt");
