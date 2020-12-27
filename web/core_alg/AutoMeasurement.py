@@ -7,13 +7,13 @@ import os
 import open3d as o3d
 from pathlib import Path
 import pywavefront
-from rest_framework import status
 
 
 # self defined functions
 from core_alg.base import Bone
 from core_alg.scan import image_process
 from core_alg.utilities import logging_utils
+from core_alg.utilities import dict_result_to_csv
 
 # global variables
 # logging file info
@@ -94,6 +94,7 @@ class AutoMeasurement(object):
         # take measurement
         scan_pcd = self.load_file()
         bone = self.process(scan_pcd)
-        return JsonResponse({"message": "measure successful",
-                            "results": str(bone.get_measurement_results())},
-                            status=status.HTTP_200_OK)
+        measurement_result = bone.get_measurement_results()
+
+        csv_result = dict_result_to_csv.dict_result_to_csv(measurement_result, bone_type)
+        return csv_result

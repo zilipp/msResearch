@@ -5,7 +5,6 @@ import logging
 import os
 from pathlib import Path
 
-
 # self defined functions
 from core_alg.AutoMeasurement import AutoMeasurement
 
@@ -27,9 +26,7 @@ def index(request):
     elif request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            logging.info("hhh")
             handle_uploaded_file(request.FILES['file'])
-            # logging.info(request.POST.get('bone_type', 'Humur'))
             result = autoMeasurement.compute(request)
             return result
         else:
