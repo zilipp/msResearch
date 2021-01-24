@@ -3,6 +3,10 @@
 The structure of the project is as following:
 
 ```
++-- data
+|   +-- iphone_ten
+|   +-- markII
+|   +-- structure_sensor
 +-- ios
 |   +-- native_app
 |   +-- structure_sensor_sdk
