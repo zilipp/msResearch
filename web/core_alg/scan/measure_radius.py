@@ -7,12 +7,23 @@ import numpy.polynomial.polynomial as poly
 
 # self defined functions
 from core_alg.base import Bone
+from core_alg.base import Device
 from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
 
-# parameter to tune error
-rml_coeff = 0.996
-rmld_coeff = 1.035
+
+def tune_params(device):
+    # parameter to tune error
+    global rml_coeff, rmld_coeff
+    if device == Device.Type.SENSOR_I:
+        rml_coeff = 0.996
+        rmld_coeff = 1.035
+    elif device == Device.Type.IPHONE_TEN:
+        rml_coeff = 1
+        rmld_coeff = 1
+    else:
+        rml_coeff = 0.996
+        rmld_coeff = 1.035
 
 
 def get_rml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
@@ -97,34 +108,14 @@ def get_rmld(center_bone_points, show_figure, alpha_shape):
 
     # vertical line
     rmld = poly.polyval(0, top_line_p) - poly.polyval(0, bottom_line_p)
-
-    # min_line_segment_length = rmld ** 2
-    # for i in np.arange(-30, 30, .05):
-    #     if i == 0:
-    #         continue
-    #     x = i
-    #     y = top_line_p[2] * x * x + top_line_p[1] * x + top_line_p[0]
-    #     k = y / x
-    #     [x_res1, x_res2] = np.roots([bottom_line_p[2], bottom_line_p[1] - k, bottom_line_p[0]])
-    #
-    #     y_res1 = k * x_res1
-    #     dis_1 = x_res1 ** 2 + y_res1 ** 2
-    #     y_res2 = k * x_res2
-    #     dis_2 = x_res2 ** 2 + y_res2 ** 2
-    #
-    #     [x1, y1] = [x_res1, y_res1] if dis_1 < dis_2 else [x_res2, y_res2]
-    #
-    #     dis_cur = distance_util.distance_2_point_to_point([x, y], [x1, y1])
-    #     min_line_segment_length = min(dis_cur, min_line_segment_length)
-    #
-    # rmld = math.sqrt(min_line_segment_length)
     rmld /= rmld_coeff
     return rmld
 
 
-def get_measurement(radius, show_figure):
+def get_measurement(radius, show_figure, device=Device.Type.SENSOR_I):
     logging.info('Start measuring radius...')
 
+    tune_params(device)
     _, left_region_points_ordered = bone_region_util.get_left_region(
         radius.alpha_shape)
     center_region, center_region_points = bone_region_util.get_center_region(

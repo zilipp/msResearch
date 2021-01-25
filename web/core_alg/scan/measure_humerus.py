@@ -6,14 +6,27 @@ import matplotlib.pyplot as plt
 
 # self defined functions
 from core_alg.base import Bone
+from core_alg.base import Device
 from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
 
-# parameter to tune error
-hml_coeff = 0.996
-heb_coeff = 0.994
-hhd_coeff = 0.965
 
+def tune_params(device):
+    # parameter to tune error
+    global hml_coeff, heb_coeff, hhd_coeff
+
+    if device == Device.Type.SENSOR_I:
+        hml_coeff = 0.996
+        heb_coeff = 0.994
+        hhd_coeff = 0.965
+    elif device == Device.Type.IPHONE_TEN:
+        hml_coeff = 1
+        heb_coeff = 1
+        hhd_coeff = 1
+    else:
+        hml_coeff = 0.996
+        heb_coeff = 0.994
+        hhd_coeff = 0.965
 
 def get_hml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, _min_y, max_x, _max_y) = alpha_shape.exterior.bounds
@@ -179,8 +192,10 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
     return hhd
 
 
-def get_measurement(humerus, show_figure):
+def get_measurement(humerus, show_figure, device=Device.Type.SENSOR_I):
     logging.info('Start measuring humerus...')
+
+    tune_params(device)
 
     left_region, left_region_points_ordered = bone_region_util.get_left_region(humerus.alpha_shape)
     right_region, right_region_points_ordered = bone_region_util.get_right_region(

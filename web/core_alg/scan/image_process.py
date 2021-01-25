@@ -7,33 +7,78 @@ import alphashape
 from shapely import affinity
 from shapely.geometry import Polygon
 from matplotlib import pyplot as plt
-import random
 
 # self defined functions
 from core_alg.base import Bone
+from core_alg.base import Device
 from core_alg.utilities import distance_util
 from core_alg.utilities import visualization_util
 
-# random.seed(1)
 
-# params for remove background
-distance_threshold_femur = 3
-distance_threshold_radius = 3
-distance_threshold_tibia = 2
-ransac_n = 3
-num_iterations = 10000
+def tune_params(device):
+    global distance_threshold_femur, distance_threshold_radius, distance_threshold_tibia, \
+        ransac_n, num_iterations
+    global nb_neighbors_femur, nb_neighbors_radius, nb_neighbors_humerus
+    global std_ratio_femur, std_ratio_radius, std_ratio_humerus
+    global alpha_radius, alpha_femur
 
-nb_neighbors_femur = 20
-nb_neighbors_radius = 20
-nb_neighbors_humerus = 20
+    if device == Device.Type.SENSOR_I:
+        # params for remove background
+        distance_threshold_femur = 3
+        distance_threshold_radius = 3
+        distance_threshold_tibia = 2
+        ransac_n = 3
+        num_iterations = 10000
 
-std_ratio_femur = 0.5
-std_ratio_radius = 2
-std_ratio_humerus = 2
+        nb_neighbors_femur = 20
+        nb_neighbors_radius = 20
+        nb_neighbors_humerus = 20
 
-# params for alpha-shape
-alpha_radius = 0.05
-alpha_femur = 0.4
+        std_ratio_femur = 0.5
+        std_ratio_radius = 2
+        std_ratio_humerus = 2
+
+        # params for alpha-shape
+        alpha_radius = 0.05
+        alpha_femur = 0.4
+    elif device == Device.Type.IPHONE_TEN:
+        # params for remove background
+        distance_threshold_femur = 3
+        distance_threshold_radius = 3
+        distance_threshold_tibia = 2
+        ransac_n = 3
+        num_iterations = 10000
+
+        nb_neighbors_femur = 20
+        nb_neighbors_radius = 20
+        nb_neighbors_humerus = 20
+
+        std_ratio_femur = 0.5
+        std_ratio_radius = 2
+        std_ratio_humerus = 2
+
+        # params for alpha-shape
+        alpha_radius = 0.05
+        alpha_femur = 0.4
+    else:
+        # params for remove background
+        distance_threshold_femur = 3
+        distance_threshold_radius = 3
+        distance_threshold_tibia = 2
+        ransac_n = 3
+        num_iterations = 10000
+
+        nb_neighbors_femur = 20
+        nb_neighbors_radius = 20
+        nb_neighbors_humerus = 20
+
+        std_ratio_femur = 0.5
+        std_ratio_radius = 2
+        std_ratio_humerus = 2
+
+        # params for alpha-shape
+        alpha_radius = 0.05
+        alpha_femur = 0.4
 
 
 def scale_image(scan_obj):
@@ -47,16 +92,11 @@ def mesh_to_points_cloud(scan_obj):
     number_of_points = np.asarray(scan_obj.vertices).shape[0]
     scan_obj.compute_vertex_normals()
     scan_pcd1 = scan_obj.sample_points_uniformly(number_of_points*2)
-
-    # todo: check for randomness
-    scan_pcd2 = scan_obj.sample_points_uniformly(number_of_points*2)
-
     return scan_pcd1
 
 
 def remove_background(scan_pcd, bone_type, show_figure):
     # find plane using RANSAC: plane function: ax + by + cz + d = 0
-    # todo: check for randomness
     plane_model, inliers = None, None
     if bone_type == Bone.Type.RADIUS:
         plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_radius,
@@ -241,14 +281,13 @@ def get_alpha_shape(points, bone_type, show_figure):
     return alpha_shape
 
 
-def preprocess_bone(scan_pcd, bone_type, show_figure):
+def preprocess_bone(scan_pcd, bone_type, show_figure, device):
     logging.info('Pre-processing {}'.format(bone_type.name.lower()))
 
+    tune_params(device)
     # 1. Scale unit length to 1 mm(coordinate 1000x)
-    # scan_pcd = scale_image(scan_pcd)
 
     # 2. Change mesh to point cloud
-    # scan_pcd = mesh_to_points_cloud(scan_pcd)
 
     # 3. Remove background
     bone_cloud, plane = remove_background(scan_pcd, bone_type, show_figure)

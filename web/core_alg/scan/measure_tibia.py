@@ -5,10 +5,22 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 from core_alg.base import Bone
+from core_alg.base import Device
 from core_alg.utilities import bone_region_util
 
-tml_coeff = 0.995
-tpb_coeff = 0.985
+
+def tune_params(device):
+    # parameter to tune error
+    global tml_coeff, tpb_coeff
+    if device == Device.Type.SENSOR_I:
+        tml_coeff = 0.995
+        tpb_coeff = 0.985
+    elif device == Device.Type.IPHONE_TEN:
+        tml_coeff = 1
+        tpb_coeff = 1
+    else:
+        tml_coeff = 0.995
+        tpb_coeff = 0.985
 
 
 def get_tml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
@@ -96,8 +108,10 @@ def get_tpb(alpha_shape, show_figure, left_bone, left_bone_points_ordered):
     return tpb
 
 
-def get_measurement(tibia, show_figure):
+def get_measurement(tibia, show_figure, device=Device.Type.SENSOR_I):
     logging.info('Start measuring tibia')
+    tune_params(device)
+
     left_region, left_region_points_ordered = bone_region_util.get_left_region(
         tibia.alpha_shape)
     _, right_region_points_ordered = bone_region_util.get_right_region(

@@ -7,14 +7,33 @@ import numpy.polynomial.polynomial as poly
 
 # self defined functions
 from core_alg.base import Bone
+from core_alg.base import Device
 from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
 
-fml_coeff = 0.997
-feb_coeff = 0.995
-fbml_coeff = 0.997
-fmld_coeff = 0.958
-fhd_coeff = 0.971
+
+def tune_params(device):
+    global fml_coeff, feb_coeff, fbml_coeff, fmld_coeff, fhd_coeff
+
+    if device == Device.Type.SENSOR_I:
+        fml_coeff = 0.997
+        feb_coeff = 0.995
+        fbml_coeff = 0.997
+        fmld_coeff = 0.958
+        fhd_coeff = 0.971
+    elif device == Device.Type.IPHONE_TEN:
+        fml_coeff = 1
+        feb_coeff = 1
+        fbml_coeff = 1
+        fmld_coeff = 1
+        fhd_coeff = 1
+    else:
+        fml_coeff = 0.997
+        feb_coeff = 0.995
+        fbml_coeff = 0.997
+        fmld_coeff = 0.958
+        fhd_coeff = 0.971
+
 
 
 def get_fml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
@@ -327,8 +346,10 @@ def get_fhd(right_bone, right_bone_points_ordered, show_figure, alpha_shape):
     return fhd
 
 
-def get_measurement(femur, show_figure):
+def get_measurement(femur, show_figure, device=Device.Type.SENSOR_I):
     logging.info('Start measuring femur')
+
+    tune_params(device)
 
     left_region, left_region_points_ordered = bone_region_util.get_left_region(
         femur.alpha_shape)
