@@ -18,6 +18,29 @@ The structure of the project is as following:
 +-- .gitignore
 ```
 
+The structure of `/data` is as following:
+
+```
++-- data
+|   +-- iphone_ten
+|   +-- markII
+    |   +-- scan
+        |   +-- femur
+            |   +-- Model.mtl
+            |   +-- femur_0.obj
+            |   +-- femur_1.obj
+            |   +-- femur_2.obj
+            |   +-- femur_3.obj
+        |   +-- radius
+        |   +-- humerus
+        |   +-- tibia
+|   +-- structure_sensor
+|   +-- CR-1-l-fem
+|   +-- CR-2-2-tib
+
+```
+
+
 In `/ios` 
 
 `/native_app`: contains an application works in iOS mobile device 
