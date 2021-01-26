@@ -64,7 +64,7 @@ def tune_params(device):
         # params for remove background
         distance_threshold_femur = 3
         distance_threshold_radius = 3
-        distance_threshold_tibia = 2
+        distance_threshold_tibia = 3
         ransac_n = 3
         num_iterations = 10000
 
@@ -72,13 +72,13 @@ def tune_params(device):
         nb_neighbors_radius = 20
         nb_neighbors_humerus = 20
 
-        std_ratio_femur = 0.5
+        std_ratio_femur = 1
         std_ratio_radius = 2
         std_ratio_humerus = 2
 
         # params for alpha-shape
         alpha_radius = 0.05
-        alpha_femur = 0.4
+        alpha_femur = 0.2
 
 
 def scale_image(scan_obj):
@@ -255,10 +255,10 @@ def get_alpha_shape(points, bone_type, show_figure):
         # both femur and humerus need put head to right-lower corner
         # femur and humerus: head on the left or right
         left_box = Polygon(
-            [(min_x, min_y), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y)])
+            [(min_x, min_y), (min_x, max_y), (min_x + x_length / 20, max_y), (min_x + x_length / 20, min_y)])
         left_bone = alpha_shape.intersection(left_box)
         right_box = Polygon(
-            [(max_x - x_length / 10, min_y), (max_x - x_length / 10, max_y), (max_x, max_y), (max_x, min_y)])
+            [(max_x - x_length / 20, min_y), (max_x - x_length / 20, max_y), (max_x, max_y), (max_x, min_y)])
         right_bone = alpha_shape.intersection(right_box)
         if left_bone.area < right_bone.area:
             alpha_shape = affinity.scale(

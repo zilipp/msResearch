@@ -140,6 +140,10 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
                 max_dist = dist
                 point_c_idx = i + 1
 
+    # no points between point_a and point_b
+    if point_c_idx == 0:
+        point_c_idx = point_a_idx[0]
+
     point_c = right_region_points_ordered[point_c_idx]
 
     # Find bottom point d

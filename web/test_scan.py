@@ -22,15 +22,17 @@ _root_dir = _out_root_dir.parent
 _user_logs_file = os.path.join(
     _out_root_dir, 'out', 'core_alg', 'logs', 'logs.txt')
 _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
-# process more files
-multi_files = False
 
-index_default = 6
 # switch for figure
-show_figure = True
-bone_type = Bone.Type.TIBIA
+show_figure = False
+bone_type = Bone.Type.HUMERUS
 # switch for structure sensor/ iphone10/ MarkII
-device = Device.Type.MARK_II
+device = Device.Type.CR3
+
+# process more files
+multi_files = True
+index_default = 2
+number_of_file = 10
 
 
 def load_file(index=index_default):
@@ -39,6 +41,14 @@ def load_file(index=index_default):
         device_dir = 'structure_sensor'
     elif device == Device.Type.IPHONE_TEN:
         device_dir = 'iphone_ten'
+    elif device == Device.Type.CR1:
+        device_dir = 'CR-1-l-fem'
+    elif device == Device.Type.CR2:
+        device_dir = 'CR-2-r-tib'
+    elif device == Device.Type.CR3:
+        device_dir = 'CR-3-r-hum'
+    elif device == Device.Type.CR4:
+        device_dir = 'CR-4-r-rad'
     else:
         device_dir = 'markII'
     obj_dir = os.path.join(_root_dir, 'data', device_dir, 'scan', bone_type_str,
@@ -51,9 +61,8 @@ def load_file(index=index_default):
     # Scale unit length to 1 mm(coordinate 1000x)
     vertices = np.asarray(scan_obj.vertices) * 1000
 
-    if not device:
-        # iphone_ten image has color info on "v" line
-        vertices = vertices[:, :3]
+    # delete color info on "v" line
+    vertices = vertices[:, :3]
 
     scan_pcd = o3d.geometry.PointCloud()
     scan_pcd.points = o3d.utility.Vector3dVector(vertices)
@@ -94,7 +103,7 @@ if __name__ == "__main__":
 
     bones = list()
     if multi_files:
-        for i in range(9):
+        for i in range(number_of_file):
             # 1. Load file
             scan_pcd = load_file(i)
             bones.append(process(scan_pcd))

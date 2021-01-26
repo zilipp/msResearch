@@ -125,7 +125,7 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered, sho
     x_min_point_index = 0
 
     # 如果最小的点不是线段头上的前十个点，说明它是P2
-    while x_min_point_index < 10:
+    while x_min_point_index < 5:
         # delete point_b(start point of left box) to current_point, fine the most left point in remaining points
         left_bone_points_ordered = left_bone_points_ordered[x_min_point_index + 1:]
         x_min_point = min(left_bone_points_ordered, key=lambda t: t[0])
@@ -342,7 +342,6 @@ def get_fhd(right_bone, right_bone_points_ordered, show_figure, alpha_shape):
         plt.show()
 
     fhd /= fhd_coeff
-    logging.info('fhd: {0:0.3f}'.format(fhd))
     return fhd
 
 
