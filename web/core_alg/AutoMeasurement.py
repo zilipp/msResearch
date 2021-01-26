@@ -50,8 +50,6 @@ class AutoMeasurement(object):
         scan_pcd = o3d.geometry.PointCloud()
         scan_pcd.points = o3d.utility.Vector3dVector(vertices)
 
-        # if show_figure:
-        #     o3d.visualization.draw_geometries([scan_pcd], mesh_show_wireframe=True)
         return scan_pcd
 
     def process(self, scan_pcd):
