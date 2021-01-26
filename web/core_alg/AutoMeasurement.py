@@ -11,6 +11,7 @@ import pywavefront
 
 # self defined functions
 from core_alg.base import Bone
+from core_alg.base import Device
 from core_alg.scan import image_process
 from core_alg.utilities import logging_utils
 from core_alg.utilities import dict_result_to_csv
@@ -43,9 +44,8 @@ class AutoMeasurement(object):
         # Scale unit length to 1 mm(coordinate 1000x)
         vertices = np.asarray(scan_obj.vertices) * 1000
 
-        if not self.structure_sensor:
-            # iphone_ten image has color info on "v" line
-            vertices = vertices[:, :3]
+        # iphone_ten image has color info on "v" line
+        vertices = vertices[:, :3]
 
         scan_pcd = o3d.geometry.PointCloud()
         scan_pcd.points = o3d.utility.Vector3dVector(vertices)
@@ -68,7 +68,7 @@ class AutoMeasurement(object):
 
         # 2. 3D model pre-processing
         alpha_shape = image_process.preprocess_bone(
-            scan_pcd, self.bone_type, show_figure=False)
+            scan_pcd, self.bone_type, show_figure=False,device=Device.Type.MARK_II)
         bone.set_alpha_shape(alpha_shape)
 
         # 3 Measurements
