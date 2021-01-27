@@ -71,3 +71,15 @@ set settings:
 ```bash
 STATIC_ROOT = os.path.join(BASE_DIR, "measurebone", "static")
 ```
+
+useful urls:\
+
+subtree: \
+https://medium.com/@shalandy/deploy-git-subdirectory-to-heroku-ea05e95fce1f
+
+deploy:\
+https://www.youtube.com/watch?v=GMbVzl_aLxM&ab_channel=PrettyPrinted
+
+
+
+

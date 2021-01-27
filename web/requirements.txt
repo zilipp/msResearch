@@ -9,6 +9,8 @@ pandas
 djangorestframework==3.11.0
 shapely
 django-heroku
+gunicorn
+
 
 
 
