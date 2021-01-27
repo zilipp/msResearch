@@ -46,3 +46,4 @@ def handle_uploaded_file(f):
         data = fin.read().splitlines(True)
     with open(cache_file_path, 'w') as fout:
         fout.writelines(data[2:])
+    logger.info('saved to obj file')

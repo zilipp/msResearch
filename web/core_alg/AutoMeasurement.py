@@ -36,7 +36,7 @@ class AutoMeasurement(object):
         logging_utils.init_logger(_user_logs_file)
 
     def load_file(self):
-        obj_dir = os.path.join(_root_dir, 'web', 'cache', 'cache.obj')
+        obj_dir = os.path.join(_out_root_dir, 'cache', 'cache.obj')
         logging.info('Loading model from {0}'.format(obj_dir))
         scan_obj = pywavefront.Wavefront(
             obj_dir, strict=True, encoding="iso-8859-1", parse=True)
