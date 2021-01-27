@@ -50,7 +50,7 @@ class AutoMeasurement(object):
         scan_pcd = o3d.geometry.PointCloud()
         scan_pcd.points = o3d.utility.Vector3dVector(vertices)
 
-        logging.info('Loading model succeed')
+        logging.info('Loading model succeed!')
         return scan_pcd
 
     def process(self, scan_pcd):
