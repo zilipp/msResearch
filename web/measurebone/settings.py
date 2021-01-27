@@ -122,7 +122,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "measurebone", "site_static")]
-STATIC_ROOT = os.path.join(BASE_DIR, "measurebone", "static")
+# if local:
+# STATIC_ROOT = os.path.join(BASE_DIR, "measurebone", "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "measurebone", "site_static")
+
+
 # MEDIA_ROOT = os.path.join(BASE_DIR, "measurebone", "media")
 # MEDIA_URL = "/media/"
 

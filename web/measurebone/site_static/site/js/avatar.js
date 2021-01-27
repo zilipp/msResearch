@@ -28,7 +28,8 @@ document.getElementById('avatar_form').addEventListener('submit', function(event
     //     console.error('Error:', error);
     // });
 
-    let url = 'http://127.0.0.1:8080/analysis/'
+    let url = window.location.href + 'analysis/'
+    // let url = 'http://127.0.0.1:8000/analysis/'
     fetch(url, {
         method: 'POST',
         headers: { },

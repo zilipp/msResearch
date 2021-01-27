@@ -60,3 +60,14 @@ https://drive.google.com/drive/folders/1UpFqdTYEeKpiWvTvGRh0lItcKqYEDipQ?usp=sha
 Report can be downloaded from: 
 
 https://drive.google.com/drive/folders/12TX--8sONiThB2JGfjid0tvrq0stinot?usp=sharing
+
+
+## Instruction on web server:
+run local: change directory to /web
+```bash
+python manage.py runserver
+```
+set settings: 
+```bash
+STATIC_ROOT = os.path.join(BASE_DIR, "measurebone", "static")
+```

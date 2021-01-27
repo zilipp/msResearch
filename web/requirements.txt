@@ -8,6 +8,6 @@ pywavefront == 1.3.2
 pandas
 djangorestframework==3.11.0
 shapely
-sklearn
-alphashape
-pandas
+# django-heroku
+
+
