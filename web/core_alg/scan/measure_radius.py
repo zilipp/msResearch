@@ -57,14 +57,20 @@ def get_rml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
 
 
 def get_rmld(center_bone_points, show_figure, alpha_shape):
+    (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
+    mid_x = (max_x + min_x) / 2
+    mid_y = (max_y + min_y) / 2
+
     center_bone_points = np.asarray(center_bone_points)
+    average_y = np.mean(center_bone_points, axis=0)[1]
+
     center_bone_points_upper = np.asarray(
-        [x for x in center_bone_points if x[1] >= 0])
+        [x for x in center_bone_points if x[1] >= average_y])
     center_bone_points_upper = center_bone_points_upper[np.argsort(
         center_bone_points_upper[:, 0])]
 
     center_bone_points_lower = np.asarray(
-        [x for x in center_bone_points if x[1] <= 0])
+        [x for x in center_bone_points if x[1] <= average_y])
     center_bone_points_lower = center_bone_points_lower[np.argsort(
         center_bone_points_lower[:, 0])]
 
@@ -90,7 +96,7 @@ def get_rmld(center_bone_points, show_figure, alpha_shape):
         plt.scatter(
             center_bone_points_lower[:, 0], center_bone_points_lower[:, 1],  marker='+')
 
-        plt.plot([0], [0], '*')  # plotting t, c separately
+        plt.plot([mid_x], [average_y], '*')  # plotting t, c separately
         plt.show()
 
     if show_figure:
@@ -102,12 +108,14 @@ def get_rmld(center_bone_points, show_figure, alpha_shape):
         b = bottom_line_p[2] * x * x + bottom_line_p[1] * x + bottom_line_p[0]
         ax.plot(x, a, 'r')  # plotting t, a separately
         ax.plot(x, b, 'r')  # plotting t, b separately
-        ax.plot([0], [0], 'r*')  # plotting t, c separately
+        ax.plot([mid_x], [average_y], 'r*')  # plotting t, c separately
         ax.set_aspect('equal')
         plt.show()
 
     # vertical line
-    rmld = poly.polyval(0, top_line_p) - poly.polyval(0, bottom_line_p)
+
+
+    rmld = poly.polyval(mid_x, top_line_p) - poly.polyval(mid_x, bottom_line_p)
     rmld /= rmld_coeff
     return rmld
 

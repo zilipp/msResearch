@@ -16,8 +16,8 @@ from core_alg.utilities import visualization_util
 
 
 def tune_params(device):
-    global distance_threshold_femur, distance_threshold_radius, distance_threshold_tibia, \
-        ransac_n, num_iterations
+    global distance_threshold_femur, distance_threshold_humerus, distance_threshold_radius, \
+        distance_threshold_tibia, ransac_n, num_iterations
     global nb_neighbors_femur, nb_neighbors_radius, nb_neighbors_humerus
     global std_ratio_femur, std_ratio_radius, std_ratio_humerus
     global alpha_radius, alpha_femur
@@ -25,6 +25,7 @@ def tune_params(device):
     if device == Device.Type.SENSOR_I:
         # params for remove background
         distance_threshold_femur = 3
+        distance_threshold_humerus = 3
         distance_threshold_radius = 3
         distance_threshold_tibia = 2
         ransac_n = 3
@@ -62,7 +63,8 @@ def tune_params(device):
         alpha_femur = 0.4
     else:
         # params for remove background
-        distance_threshold_femur = 3
+        distance_threshold_femur = 4
+        distance_threshold_humerus = 3
         distance_threshold_radius = 3
         distance_threshold_tibia = 3
         ransac_n = 3
@@ -104,6 +106,10 @@ def remove_background(scan_pcd, bone_type, show_figure):
                                                       num_iterations=num_iterations)
     elif bone_type == Bone.Type.TIBIA:
         plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_tibia,
+                                                      ransac_n=ransac_n,
+                                                      num_iterations=num_iterations)
+    elif bone_type == Bone.Type.HUMERUS:
+        plane_model, inliers = scan_pcd.segment_plane(distance_threshold=distance_threshold_humerus,
                                                       ransac_n=ransac_n,
                                                       num_iterations=num_iterations)
     else:
@@ -255,10 +261,10 @@ def get_alpha_shape(points, bone_type, show_figure):
         # both femur and humerus need put head to right-lower corner
         # femur and humerus: head on the left or right
         left_box = Polygon(
-            [(min_x, min_y), (min_x, max_y), (min_x + x_length / 20, max_y), (min_x + x_length / 20, min_y)])
+            [(min_x, min_y), (min_x, max_y), (min_x + x_length / 18, max_y), (min_x + x_length / 18, min_y)])
         left_bone = alpha_shape.intersection(left_box)
         right_box = Polygon(
-            [(max_x - x_length / 20, min_y), (max_x - x_length / 20, max_y), (max_x, max_y), (max_x, min_y)])
+            [(max_x - x_length / 18, min_y), (max_x - x_length / 18, max_y), (max_x, max_y), (max_x, min_y)])
         right_bone = alpha_shape.intersection(right_box)
         if left_bone.area < right_bone.area:
             alpha_shape = affinity.scale(
@@ -272,7 +278,7 @@ def get_alpha_shape(points, bone_type, show_figure):
             alpha_shape = affinity.scale(
                 alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
 
-    if show_figure:
+    if not show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
         ax.plot(x, y)

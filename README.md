@@ -80,6 +80,15 @@ https://medium.com/@shalandy/deploy-git-subdirectory-to-heroku-ea05e95fce1f
 deploy:\
 https://www.youtube.com/watch?v=GMbVzl_aLxM&ab_channel=PrettyPrinted
 
+buildpack: \
+https://github.com/heroku/heroku-buildpack-apt
+
+```bash
+heroku buildpacks:add --index 1 heroku-community/apt
+git subtree push --prefix web heroku master
+heroku logs --tail
+```
+
 
 
 

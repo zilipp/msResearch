@@ -160,15 +160,20 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered, sho
 
 
 def get_fmld(center_bone_points, show_figure, alpha_shape):
+    (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
+    mid_x = (max_x + min_x) / 2
+    mid_y = (max_y + min_y) / 2
+
     center_bone_points = np.asarray(center_bone_points)
+    average_y = np.mean(center_bone_points, axis=0)[1]
     # sort upper and lower points in order by x-value
     center_bone_points_upper = np.asarray(
-        [x for x in center_bone_points if x[1] >= 0])
+        [x for x in center_bone_points if x[1] >= average_y])
     center_bone_points_upper = center_bone_points_upper[np.argsort(
         center_bone_points_upper[:, 0])]
 
     center_bone_points_lower = np.asarray(
-        [x for x in center_bone_points if x[1] <= 0])
+        [x for x in center_bone_points if x[1] <= average_y])
     center_bone_points_lower = center_bone_points_lower[np.argsort(
         center_bone_points_lower[:, 0])]
 
@@ -187,20 +192,20 @@ def get_fmld(center_bone_points, show_figure, alpha_shape):
         b = bottom_line_p[2] * x * x + bottom_line_p[1] * x + bottom_line_p[0]
         ax.plot(x, a, 'r')  # plotting t, a separately
         ax.plot(x, b, 'r')  # plotting t, b separately
-        ax.plot([0], [0], 'r*')  # plotting t, c separately
+        ax.plot([mid_x], [average_y], 'r*')  # plotting t, c separately
         ax.set_aspect('equal')
         plt.show()
 
     # vertical line
-    fmld = poly.polyval(0, top_line_p) - poly.polyval(0, bottom_line_p)
+    fmld = poly.polyval(mid_x, top_line_p) - poly.polyval(mid_x, bottom_line_p)
 
     min_line_segment_length = fmld ** 2
-    for i in np.arange(-20, 20, .01):
-        if i == 0:
-            continue
+    for i in np.arange(mid_x-20, mid_x+20, .01):
         x = i
         y = top_line_p[2] * x * x + top_line_p[1] * x + top_line_p[0]
-        k = y / x
+        if mid_x - x == 0:
+            continue
+        k = (average_y - y) / (mid_x - x)
         [x_res1, x_res2] = np.roots(
             [bottom_line_p[2], bottom_line_p[1] - k, bottom_line_p[0]])
 

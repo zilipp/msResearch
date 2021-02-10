@@ -25,14 +25,14 @@ _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 
 # switch for figure
 show_figure = False
-bone_type = Bone.Type.HUMERUS
+bone_type = Bone.Type.TIBIA
 # switch for structure sensor/ iphone10/ MarkII
-device = Device.Type.CR3
+device = Device.Type.NEW_UIC_4
 
 # process more files
 multi_files = True
-index_default = 2
-number_of_file = 10
+index_default = 9
+number_of_file = 3
 
 
 def load_file(index=index_default):
@@ -49,8 +49,26 @@ def load_file(index=index_default):
         device_dir = 'CR-3-r-hum'
     elif device == Device.Type.CR4:
         device_dir = 'CR-4-r-rad'
+    elif device == Device.Type.UIC4:
+        device_dir = 'UIC4'
+    elif device == Device.Type.UIC6_L:
+        device_dir = 'UIC6-l'
+    elif device == Device.Type.UIC6_R:
+        device_dir = 'UIC6-r'
+    elif device == Device.Type.UIC7_L:
+        device_dir = 'UIC-7-l'
+    elif device == Device.Type.UIC7_R:
+        device_dir = 'UIC-7-r'
+    elif device == Device.Type.UIC9_L:
+        device_dir = 'UIC-9-l'
+    elif device == Device.Type.UIC9_R:
+        device_dir = 'UIC-9-r'
+    elif device == Device.Type.UIC10_L:
+        device_dir = 'UIC-10-l'
+    elif device == Device.Type.UIC10_R:
+        device_dir = 'UIC-10-r'
     else:
-        device_dir = 'markII'
+        device_dir = 'New-UIC-4-r'
     obj_dir = os.path.join(_root_dir, 'data', device_dir, 'scan', bone_type_str,
                            '{}_{}.obj'.format(bone_type_str, str(index)))
 
