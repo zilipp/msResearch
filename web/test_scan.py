@@ -8,11 +8,12 @@ from pathlib import Path
 
 # self defined functions
 from core_alg.base import Bone
-from core_alg.base import Device
+from core_alg.base import Filefolder
 from core_alg.scan import image_process
 from core_alg.utilities import logging_utils
 from core_alg.utilities import csv_out_utils
 from core_alg.utilities import results_anlysis
+from core_alg.utilities import loadfile_util
 
 # global variables
 # logging file info
@@ -27,7 +28,7 @@ _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 show_figure = False
 bone_type = Bone.Type.HUMERUS
 # switch for structure sensor/ iphone10/ MarkII
-device = Device.Type.UIC7_L
+folder = Filefolder.Type.UIC7_L
 
 # process more files
 multi_files = False
@@ -37,39 +38,8 @@ number_of_file = 3
 
 def load_file(index=index_default):
     bone_type_str = bone_type.name.lower()
-    if device == Device.Type.SENSOR_I:
-        device_dir = 'structure_sensor'
-    elif device == Device.Type.IPHONE_TEN:
-        device_dir = 'iphone_ten'
-    elif device == Device.Type.CR1:
-        device_dir = 'CR-1-l-fem'
-    elif device == Device.Type.CR2:
-        device_dir = 'CR-2-r-tib'
-    elif device == Device.Type.CR3:
-        device_dir = 'CR-3-r-hum'
-    elif device == Device.Type.CR4:
-        device_dir = 'CR-4-r-rad'
-    elif device == Device.Type.UIC4:
-        device_dir = 'UIC4'
-    elif device == Device.Type.UIC6_L:
-        device_dir = 'UIC-6-l'
-    elif device == Device.Type.UIC6_R:
-        device_dir = 'UIC-6-r'
-    elif device == Device.Type.UIC7_L:
-        device_dir = 'UIC-7-l'
-    elif device == Device.Type.UIC7_R:
-        device_dir = 'UIC-7-r'
-    elif device == Device.Type.UIC9_L:
-        device_dir = 'UIC-9-l'
-    elif device == Device.Type.UIC9_R:
-        device_dir = 'UIC-9-r'
-    elif device == Device.Type.UIC10_L:
-        device_dir = 'UIC-10-l'
-    elif device == Device.Type.UIC10_R:
-        device_dir = 'UIC-10-r'
-    else:
-        device_dir = 'New-UIC-4-r'
-    obj_dir = os.path.join(_root_dir, 'data', device_dir, 'scan', bone_type_str,
+    files_dir = loadfile_util.get_folder_dir_by_folder_name(folder)
+    obj_dir = os.path.join(_root_dir, 'data', files_dir, 'scan', bone_type_str,
                            '{}_{}.obj'.format(bone_type_str, str(index)))
 
     logging.info('Loading {0} dataset from {1}'.format(bone_type_str, obj_dir))
@@ -81,7 +51,6 @@ def load_file(index=index_default):
 
     # delete color info on "v" line
     vertices = vertices[:, :3]
-
     scan_pcd = o3d.geometry.PointCloud()
     scan_pcd.points = o3d.utility.Vector3dVector(vertices)
 
@@ -104,7 +73,7 @@ def process(scan_pcd):
 
     # 2. 3D model pre-processing
     alpha_shape = image_process.preprocess_bone(
-        scan_pcd, bone_type, show_figure, device)
+        scan_pcd, bone_type, show_figure, folder)
     bone.set_alpha_shape(alpha_shape)
 
     # 3 Measurements

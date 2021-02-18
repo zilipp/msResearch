@@ -7,7 +7,7 @@ import numpy.polynomial.polynomial as poly
 
 # self defined functions
 from core_alg.base import Bone
-from core_alg.base import Device
+from core_alg.base import Filefolder
 from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
 from core_alg.utilities import rotate_utils
@@ -16,13 +16,13 @@ from core_alg.utilities import rotate_utils
 def tune_params(device):
     global fml_coeff, feb_coeff, fbml_coeff, fmld_coeff, fhd_coeff
 
-    if device == Device.Type.SENSOR_I:
+    if device == Filefolder.Type.SENSOR_I:
         fml_coeff = 0.997
         feb_coeff = 0.995
         fbml_coeff = 0.997
         fmld_coeff = 0.958
         fhd_coeff = 0.971
-    elif device == Device.Type.IPHONE_TEN:
+    elif device == Filefolder.Type.IPHONE_TEN:
         fml_coeff = 1
         feb_coeff = 1
         fbml_coeff = 1
@@ -379,7 +379,7 @@ def get_fhd(right_bone, right_bone_points_ordered, show_figure, alpha_shape):
     return fhd
 
 
-def get_measurement(femur, show_figure, device=Device.Type.SENSOR_I):
+def get_measurement(femur, show_figure, device=Filefolder.Type.SENSOR_I):
     logging.info('Start measuring femur')
 
     tune_params(device)

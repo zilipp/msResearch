@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 
 # self defined functions
 from core_alg.base import Bone
-from core_alg.base import Device
+from core_alg.base import Filefolder
 from core_alg.utilities import distance_util
 from core_alg.utilities import visualization_util
 
@@ -22,7 +22,7 @@ def tune_params(device):
     global std_ratio_femur, std_ratio_radius, std_ratio_humerus
     global alpha_radius, alpha_femur
 
-    if device == Device.Type.SENSOR_I:
+    if device == Filefolder.Type.SENSOR_I:
         # params for remove background
         distance_threshold_femur = 3
         distance_threshold_humerus = 3
@@ -42,7 +42,7 @@ def tune_params(device):
         # params for alpha-shape
         alpha_radius = 0.05
         alpha_femur = 0.4
-    elif device == Device.Type.IPHONE_TEN:
+    elif device == Filefolder.Type.IPHONE_TEN:
         # params for remove background
         distance_threshold_femur = 3
         distance_threshold_radius = 3
@@ -278,7 +278,7 @@ def get_alpha_shape(points, bone_type, show_figure):
             alpha_shape = affinity.scale(
                 alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
 
-    if not show_figure:
+    if show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
         ax.plot(x, y)

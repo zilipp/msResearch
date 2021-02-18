@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 import numpy.polynomial.polynomial as poly
 
 # self defined functions
-from core_alg.base import Bone
-from core_alg.base import Device
+from core_alg.base import Filefolder
 from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
 
@@ -15,10 +14,10 @@ from core_alg.utilities import bone_region_util
 def tune_params(device):
     # parameter to tune error
     global rml_coeff, rmld_coeff
-    if device == Device.Type.SENSOR_I:
+    if device == Filefolder.Type.SENSOR_I:
         rml_coeff = 0.996
         rmld_coeff = 1.035
-    elif device == Device.Type.IPHONE_TEN:
+    elif device == Filefolder.Type.IPHONE_TEN:
         rml_coeff = 1
         rmld_coeff = 1
     else:
@@ -114,13 +113,12 @@ def get_rmld(center_bone_points, show_figure, alpha_shape):
 
     # vertical line
 
-
     rmld = poly.polyval(mid_x, top_line_p) - poly.polyval(mid_x, bottom_line_p)
     rmld /= rmld_coeff
     return rmld
 
 
-def get_measurement(radius, show_figure, device=Device.Type.SENSOR_I):
+def get_measurement(radius, show_figure, device=Filefolder.Type.SENSOR_I):
     logging.info('Start measuring radius...')
 
     tune_params(device)

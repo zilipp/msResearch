@@ -11,7 +11,7 @@ import pywavefront
 
 # self defined functions
 from core_alg.base import Bone
-from core_alg.base import Device
+from core_alg.base import Filefolder
 from core_alg.scan import image_process
 from core_alg.utilities import logging_utils
 from core_alg.utilities import dict_result_to_csv
@@ -67,7 +67,7 @@ class AutoMeasurement(object):
 
         # 2. 3D model pre-processing
         alpha_shape = image_process.preprocess_bone(
-            scan_pcd, self.bone_type, show_figure=False,device=Device.Type.MARK_II)
+            scan_pcd, self.bone_type, show_figure=False,device=Filefolder.Type.MARK_II)
         bone.set_alpha_shape(alpha_shape)
 
         # 3 Measurements

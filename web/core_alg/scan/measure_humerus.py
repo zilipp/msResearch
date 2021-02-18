@@ -5,7 +5,7 @@ from matplotlib import pyplot
 import matplotlib.pyplot as plt
 
 # self defined functions
-from core_alg.base import Device
+from core_alg.base import Filefolder
 from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
 from core_alg.utilities import rotate_utils
@@ -15,11 +15,11 @@ def tune_params(device):
     # parameter to tune error
     global hml_coeff, heb_coeff, hhd_coeff
 
-    if device == Device.Type.SENSOR_I:
+    if device == Filefolder.Type.SENSOR_I:
         hml_coeff = 0.996
         heb_coeff = 0.994
         hhd_coeff = 0.965
-    elif device == Device.Type.IPHONE_TEN:
+    elif device == Filefolder.Type.IPHONE_TEN:
         hml_coeff = 1
         heb_coeff = 1
         hhd_coeff = 1
@@ -89,7 +89,7 @@ def get_heb(left_bone, show_figure, left_bone_points_ordered, alpha_shape):
         heb = max(heb, cur_heb)
         heb_index += 1
 
-    if not show_figure:
+    if show_figure:
         max_feb_points = rotated_list[max_heb_index]
         # top point, 1st POIs
         p_top = []
@@ -224,7 +224,7 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
     return hhd
 
 
-def get_measurement(humerus, show_figure, device=Device.Type.SENSOR_I):
+def get_measurement(humerus, show_figure, device=Filefolder.Type.SENSOR_I):
     logging.info('Start measuring humerus...')
 
     tune_params(device)
