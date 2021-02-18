@@ -10,6 +10,7 @@ from core_alg.base import Bone
 from core_alg.base import Device
 from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
+from core_alg.utilities import rotate_utils
 
 
 def tune_params(device):
@@ -29,7 +30,7 @@ def tune_params(device):
         fhd_coeff = 1
     else:
         fml_coeff = 0.997
-        feb_coeff = 0.995
+        feb_coeff = 0.99
         fbml_coeff = 0.997
         fmld_coeff = 0.958
         fhd_coeff = 0.971
@@ -72,25 +73,53 @@ def get_feb(left_bone, left_bone_points_ordered, show_figure, alpha_shape):
     (left_bone_min_x, left_bone_min_y, left_bone_max_x,
      left_bone_max_y) = left_bone.exterior.bounds
     feb = left_bone_max_y - left_bone_min_y
+    rotated_list = []
+    max_feb_index = 0
+    feb_index = 0
+    point_a_y = []
+    point_b_y = []
+    for rad in range(-10, 20, 1):
+        rotated_points = []
+        for point in left_bone_points_ordered:
+            new_point = rotate_utils.rotate(point, rad)
+            rotated_points.append(new_point)
+        rotated_list.append(rotated_points)
+
+        rotated_points = np.asarray(rotated_points)
+        max_y = rotated_points.max(axis=0)[1]
+        min_y = rotated_points.min(axis=0)[1]
+        cur_feb = max_y - min_y
+        if cur_feb > feb:
+            feb = cur_feb
+            max_feb_index = feb_index
+            point_a_y = max_y
+            point_b_y = min_y
+
+        feb = max(feb, cur_feb)
+        feb_index += 1
 
     if show_figure:
+        max_feb_points = rotated_list[max_feb_index]
         # top point, 1st POIs
         p_top = []
-        for i in range(len(left_bone_points_ordered)):
-            if left_bone_points_ordered[i][1] == left_bone_max_y:
-                p_top = left_bone_points_ordered[i]
+        for i in range(len(max_feb_points)):
+            if max_feb_points[i][1] == point_a_y:
+                p_top = max_feb_points[i]
                 break
 
         # bottom point, 1st POIs
         p_bottom = []
-        for i in range(len(left_bone_points_ordered)):
-            if left_bone_points_ordered[i][1] == left_bone_min_y:
-                p_bottom = left_bone_points_ordered[i]
+        for i in range(len(max_feb_points)):
+            if max_feb_points[i][1] == point_b_y:
+                p_bottom = max_feb_points[i]
                 break
 
         fig, ax = plt.subplots()
-        x, y = alpha_shape.exterior.xy
-        ax.plot(x, y)
+        max_feb_points = np.array(max_feb_points)
+        x = max_feb_points[:, 0].tolist()
+        y = max_feb_points[:, 1].tolist()
+        ax.scatter(x, y, marker='o')
+
         ax.plot(p_top[0], p_top[1], 'r+')
         ax.plot(p_bottom[0], p_bottom[1], 'r+')
         ax.set_aspect('equal')

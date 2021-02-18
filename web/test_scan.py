@@ -25,13 +25,13 @@ _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 
 # switch for figure
 show_figure = False
-bone_type = Bone.Type.TIBIA
+bone_type = Bone.Type.HUMERUS
 # switch for structure sensor/ iphone10/ MarkII
-device = Device.Type.NEW_UIC_4
+device = Device.Type.UIC7_L
 
 # process more files
-multi_files = True
-index_default = 9
+multi_files = False
+index_default = 1
 number_of_file = 3
 
 
@@ -52,9 +52,9 @@ def load_file(index=index_default):
     elif device == Device.Type.UIC4:
         device_dir = 'UIC4'
     elif device == Device.Type.UIC6_L:
-        device_dir = 'UIC6-l'
+        device_dir = 'UIC-6-l'
     elif device == Device.Type.UIC6_R:
-        device_dir = 'UIC6-r'
+        device_dir = 'UIC-6-r'
     elif device == Device.Type.UIC7_L:
         device_dir = 'UIC-7-l'
     elif device == Device.Type.UIC7_R:

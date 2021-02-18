@@ -5,7 +5,7 @@ from shapely.geometry import Polygon
 def get_left_region(alpha_shape):
     (minx, miny, maxx, maxy) = alpha_shape.exterior.bounds
     # todo: coefficient
-    left_box = Polygon([(minx, miny), (minx, maxy), (minx / 1.5, maxy), (minx / 1.5, miny)])
+    left_box = Polygon([(minx, miny), (minx, maxy), (minx / 1.3, maxy), (minx / 1.3, miny)])
     left_region = alpha_shape.intersection(left_box)
 
     left_region_line = left_region.exterior

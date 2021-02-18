@@ -1,14 +1,14 @@
 # python libraries
 import logging
-import numpy
+import numpy as np
 from matplotlib import pyplot
 import matplotlib.pyplot as plt
 
 # self defined functions
-from core_alg.base import Bone
 from core_alg.base import Device
 from core_alg.utilities import distance_util
 from core_alg.utilities import bone_region_util
+from core_alg.utilities import rotate_utils
 
 
 def tune_params(device):
@@ -25,7 +25,7 @@ def tune_params(device):
         hhd_coeff = 1
     else:
         hml_coeff = 0.996
-        heb_coeff = 0.994
+        heb_coeff = 0.99
         hhd_coeff = 0.965
 
 def get_hml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
@@ -61,28 +61,56 @@ def get_hml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
 
 
 def get_heb(left_bone, show_figure, left_bone_points_ordered, alpha_shape):
-    (_left_bone_min_x, left_bone_min_y, _left_bone_max_x,
+    (left_bone_min_x, left_bone_min_y, left_bone_max_x,
      left_bone_max_y) = left_bone.exterior.bounds
     heb = left_bone_max_y - left_bone_min_y
+    rotated_list = []
+    max_heb_index = 0
+    heb_index = 0
+    point_a_y = []
+    point_b_y = []
+    for rad in range(-10, 20, 1):
+        rotated_points = []
+        for point in left_bone_points_ordered:
+            new_point = rotate_utils.rotate(point, rad)
+            rotated_points.append(new_point)
+        rotated_list.append(rotated_points)
 
-    if show_figure:
+        rotated_points = np.asarray(rotated_points)
+        max_y = rotated_points.max(axis=0)[1]
+        min_y = rotated_points.min(axis=0)[1]
+        cur_heb = max_y - min_y
+        if cur_heb > heb:
+            heb = cur_heb
+            max_heb_index = heb_index
+            point_a_y = max_y
+            point_b_y = min_y
+
+        heb = max(heb, cur_heb)
+        heb_index += 1
+
+    if not show_figure:
+        max_feb_points = rotated_list[max_heb_index]
         # top point, 1st POIs
         p_top = []
-        for i in range(len(left_bone_points_ordered)):
-            if left_bone_points_ordered[i][1] == left_bone_max_y:
-                p_top = left_bone_points_ordered[i]
+        for i in range(len(max_feb_points)):
+            if max_feb_points[i][1] == point_a_y:
+                p_top = max_feb_points[i]
                 break
 
         # bottom point, 1st POIs
         p_bottom = []
-        for i in range(len(left_bone_points_ordered)):
-            if left_bone_points_ordered[i][1] == left_bone_min_y:
-                p_bottom = left_bone_points_ordered[i]
+        for i in range(len(max_feb_points)):
+            if max_feb_points[i][1] == point_b_y:
+                p_bottom = max_feb_points[i]
                 break
 
         fig, ax = plt.subplots()
-        x, y = alpha_shape.exterior.xy
-        ax.plot(x, y)
+        max_feb_points = np.array(max_feb_points)
+        x = max_feb_points[:, 0].tolist()
+        y = max_feb_points[:, 1].tolist()
+        ax.scatter(x, y, marker='o')
+
         ax.plot(p_top[0], p_top[1], 'r+')
         ax.plot(p_bottom[0], p_bottom[1], 'r+')
         ax.set_aspect('equal')
@@ -159,22 +187,22 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
     if show_figure:
         fig, ax = plt.subplots()
 
-        data = numpy.asarray(right_region_points_ordered)
+        data = np.asarray(right_region_points_ordered)
         x = data[:, 0].tolist()
         y = data[:, 1].tolist()
         ax.scatter(x, y, marker='o')
 
-        data = numpy.asarray(convex_hull)
+        data = np.asarray(convex_hull)
         x = data[:, 0].tolist()
         y = data[:, 1].tolist()
         ax.scatter(x, y, marker='*', facecolor='g')
 
-        data = numpy.asarray([point_a, point_b])
+        data = np.asarray([point_a, point_b])
         x = data[:, 0].tolist()
         y = data[:, 1].tolist()
         ax.scatter(x, y, marker='+', facecolor='orange')
 
-        data = numpy.asarray([point_c, point_d])
+        data = np.asarray([point_c, point_d])
         x = data[:, 0].tolist()
         y = data[:, 1].tolist()
         ax.scatter(x, y, marker='+', facecolor='r')
