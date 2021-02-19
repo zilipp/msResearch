@@ -261,12 +261,20 @@ def get_alpha_shape(points, bone_type, show_figure):
         # both femur and humerus need put head to right-lower corner
         # femur and humerus: head on the left or right
         left_box = Polygon(
-            [(min_x, min_y), (min_x, max_y), (min_x + x_length / 18, max_y), (min_x + x_length / 18, min_y)])
+            [(min_x, min_y), (min_x, max_y), (min_x + x_length / 15, max_y), (min_x + x_length / 15, min_y)])
         left_bone = alpha_shape.intersection(left_box)
+        (min_x_l, min_y_l, max_x_l, max_y_l) = left_bone.exterior.bounds
+        box_area_l = (max_x_l - min_x_l) * (max_y_l - min_y_l)
+
         right_box = Polygon(
-            [(max_x - x_length / 18, min_y), (max_x - x_length / 18, max_y), (max_x, max_y), (max_x, min_y)])
+            [(max_x - x_length / 15, min_y), (max_x - x_length / 15, max_y), (max_x, max_y), (max_x, min_y)])
         right_bone = alpha_shape.intersection(right_box)
-        if left_bone.area < right_bone.area:
+        (min_x_r, min_y_r, max_x_r, max_y_r) = left_bone.exterior.bounds
+        box_area_r = (max_x_r - min_x_r) * (max_y_r - min_y_r)
+
+        left_area_ratio = left_bone.area/box_area_l
+        right_area_ratio = right_bone.area / box_area_r
+        if left_area_ratio < right_area_ratio:
             alpha_shape = affinity.scale(
                 alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
 
