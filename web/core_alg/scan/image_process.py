@@ -261,32 +261,70 @@ def get_alpha_shape(points, bone_type, show_figure):
         # both femur and humerus need put head to right-lower corner
         # femur and humerus: head on the left or right
         left_box = Polygon(
-            [(min_x, min_y), (min_x, max_y), (min_x + x_length / 15, max_y), (min_x + x_length / 15, min_y)])
+            [(min_x, min_y), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y)])
         left_bone = alpha_shape.intersection(left_box)
         (min_x_l, min_y_l, max_x_l, max_y_l) = left_bone.exterior.bounds
         box_area_l = (max_x_l - min_x_l) * (max_y_l - min_y_l)
 
         right_box = Polygon(
-            [(max_x - x_length / 15, min_y), (max_x - x_length / 15, max_y), (max_x, max_y), (max_x, min_y)])
+            [(max_x - x_length / 10, min_y), (max_x - x_length / 10, max_y), (max_x, max_y), (max_x, min_y)])
         right_bone = alpha_shape.intersection(right_box)
-        (min_x_r, min_y_r, max_x_r, max_y_r) = left_bone.exterior.bounds
+        (min_x_r, min_y_r, max_x_r, max_y_r) = right_bone.exterior.bounds
         box_area_r = (max_x_r - min_x_r) * (max_y_r - min_y_r)
 
         left_area_ratio = left_bone.area/box_area_l
         right_area_ratio = right_bone.area / box_area_r
-        if left_area_ratio < right_area_ratio:
-            alpha_shape = affinity.scale(
-                alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
+
+        print(left_area_ratio, right_area_ratio)
+        if bone_type == Bone.Type.FEMUR:
+            if left_area_ratio < right_area_ratio:
+                print("flipped")
+                alpha_shape = affinity.scale(
+                    alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
+        else:
+            if left_area_ratio > right_area_ratio:
+                print("flipped")
+                alpha_shape = affinity.scale(
+                    alpha_shape, xfact=-1, yfact=1, origin=(0, 0))
 
         # head on the upper or lower part
-        center_box = Polygon([(min_x + x_length * 0.4, min_y), (min_x + x_length * 0.4, max_y),
-                              (max_x + x_length * 0.6, max_y), (max_x + x_length * 0.6, min_y)])
-        center_bone = alpha_shape.intersection(center_box)
-        if (max_y - center_bone.centroid.y) > y_length / 2:
-            alpha_shape = affinity.scale(
-                alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
+        if bone_type == Bone.Type.HUMERUS:
+            # find left most point on the left bone
+            (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
+            left_box = Polygon(
+                [(min_x, min_y), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y)])
+            left_bone = alpha_shape.intersection(left_box)
+            left_region_line = left_bone.exterior
+            left_region_points = []
+            for x, y in left_region_line.coords:
+                left_region_points.append([x, y])
 
-    if show_figure:
+            (left_bone_min_x, left_bone_min_y, left_bone_max_x,
+             left_bone_max_y) = left_bone.exterior.bounds
+            # most left point, 1st POIs
+            p_left = []
+
+            for i in range(len(left_region_points)):
+                if left_region_points[i][0] == left_bone_min_x:
+                    p_left = left_region_points[i]
+                    break
+            p_left_y = p_left[1]
+            up_dis = left_bone_max_y - p_left_y
+            down_dis = p_left_y - left_bone_min_y
+            if up_dis < down_dis:
+                alpha_shape = affinity.scale(
+                    alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
+        else:
+            # femur: find centroid in the center
+            center_box = Polygon([(min_x + x_length * 0.4, min_y), (min_x + x_length * 0.4, max_y),
+                                  (max_x + x_length * 0.6, max_y), (max_x + x_length * 0.6, min_y)])
+            center_bone = alpha_shape.intersection(center_box)
+            if (max_y - center_bone.centroid.y) > y_length / 2:
+                alpha_shape = affinity.scale(
+                    alpha_shape, xfact=1, yfact=-1, origin=(0, 0))
+
+
+    if not show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
         ax.plot(x, y)

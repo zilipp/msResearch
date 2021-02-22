@@ -3,9 +3,11 @@ import logging
 from shapely.geometry import Polygon
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import numpy as np
 
 from core_alg.base import Filefolder
 from core_alg.utilities import bone_region_util
+from core_alg.utilities import rotate_utils
 
 
 def tune_params(device):
@@ -18,8 +20,8 @@ def tune_params(device):
         tml_coeff = 1
         tpb_coeff = 1
     else:
-        tml_coeff = 0.995
-        tpb_coeff = 0.985
+        tml_coeff = 1
+        tpb_coeff = 1
 
 
 def get_tml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
@@ -32,6 +34,7 @@ def get_tml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
     left_upper_bone = alpha_shape.intersection(left_upper_box)
     (min_x_left_upper, _, _, _) = left_upper_bone.exterior.bounds
 
+
     # left-lower box
     left_lower_box = Polygon([(min_x, min_y), (min_x, min_y + y_length * 0.25), (min_x + x_length / 10, min_y + y_length * 0.25),
                               (min_x + x_length / 10,  min_y)])
@@ -41,11 +44,17 @@ def get_tml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
     poi_x = min(min_x_left_upper, min_x_left_lower)
     tml = max_x - poi_x
 
-    if show_figure:
+    if not show_figure:
         # most left point, 1st POIs
+        # possibly POI is the intersection with box and bone,
+        # x != poi_x, the point is on the box
         p_left = []
+        box_min_y = min_y + y_length * 0.25
+        box_max_y = min_y + y_length * 0.75
         for i in range(len(left_bone_points_ordered)):
-            if left_bone_points_ordered[i][0] == poi_x:
+            if box_max_y > left_bone_points_ordered[i][1] > box_min_y:
+                continue
+            if left_bone_points_ordered[i][0] - poi_x < 1:
                 p_left = left_bone_points_ordered[i]
                 break
 
@@ -75,29 +84,56 @@ def get_tml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
 
 
 def get_tpb(alpha_shape, show_figure, left_bone, left_bone_points_ordered):
-    (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
-    tpb = max_y - min_y
+    (left_bone_min_x, left_bone_min_y, left_bone_max_x,
+     left_bone_max_y) = left_bone.exterior.bounds
+    tpb = left_bone_max_y - left_bone_min_y
+    rotated_list = []
+    max_tpb_index = 0
+    tpb_index = 0
+    point_a_y = []
+    point_b_y = []
+    for rad in range(-10, 20, 1):
+        rotated_points = []
+        for point in left_bone_points_ordered:
+            new_point = rotate_utils.rotate(point, rad)
+            rotated_points.append(new_point)
+        rotated_list.append(rotated_points)
 
-    if show_figure:
-        (left_bone_min_x, left_bone_min_y, left_bone_max_x,
-         left_bone_max_y) = left_bone.exterior.bounds
+        rotated_points = np.asarray(rotated_points)
+        max_y = rotated_points.max(axis=0)[1]
+        min_y = rotated_points.min(axis=0)[1]
+        cur_tpb = max_y - min_y
+        if cur_tpb >= tpb:
+            tpb = cur_tpb
+            max_tpb_index = tpb_index
+            point_a_y = max_y
+            point_b_y = min_y
+
+        tpb = max(tpb, cur_tpb)
+        tpb_index += 1
+
+    if not show_figure:
+        max_feb_points = rotated_list[max_tpb_index]
         # top point, 1st POIs
         p_top = []
-        for i in range(len(left_bone_points_ordered)):
-            if left_bone_points_ordered[i][1] == left_bone_max_y:
-                p_top = left_bone_points_ordered[i]
+        for i in range(len(max_feb_points)):
+            if max_feb_points[i][1] == point_a_y:
+                p_top = max_feb_points[i]
                 break
 
         # bottom point, 1st POIs
         p_bottom = []
-        for i in range(len(left_bone_points_ordered)):
-            if left_bone_points_ordered[i][1] == left_bone_min_y:
-                p_bottom = left_bone_points_ordered[i]
+        for i in range(len(max_feb_points)):
+            if max_feb_points[i][1] == point_b_y:
+                p_bottom = max_feb_points[i]
                 break
 
         fig, ax = plt.subplots()
-        x, y = alpha_shape.exterior.xy
-        ax.plot(x, y)
+        max_feb_points = np.array(max_feb_points)
+        x = max_feb_points[:, 0].tolist()
+        y = max_feb_points[:, 1].tolist()
+        ax.scatter(x, y, marker='o')
+
         ax.plot(p_top[0], p_top[1], 'r+')
         ax.plot(p_bottom[0], p_bottom[1], 'r+')
         ax.set_aspect('equal')

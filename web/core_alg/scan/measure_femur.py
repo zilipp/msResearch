@@ -29,11 +29,11 @@ def tune_params(device):
         fmld_coeff = 1
         fhd_coeff = 1
     else:
-        fml_coeff = 0.997
-        feb_coeff = 0.99
-        fbml_coeff = 0.997
-        fmld_coeff = 0.958
-        fhd_coeff = 0.971
+        fml_coeff = 1
+        feb_coeff = 1
+        fbml_coeff = 1
+        fmld_coeff = 1
+        fhd_coeff = 1
 
 
 
@@ -41,7 +41,7 @@ def get_fml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
     fml = max_x - min_x
 
-    if show_figure:
+    if not show_figure:
         # most left point, 1st POIs
         p_left = []
         for i in range(len(left_bone_points_ordered)):
@@ -89,7 +89,7 @@ def get_feb(left_bone, left_bone_points_ordered, show_figure, alpha_shape):
         max_y = rotated_points.max(axis=0)[1]
         min_y = rotated_points.min(axis=0)[1]
         cur_feb = max_y - min_y
-        if cur_feb > feb:
+        if cur_feb >= feb:
             feb = cur_feb
             max_feb_index = feb_index
             point_a_y = max_y
@@ -98,7 +98,7 @@ def get_feb(left_bone, left_bone_points_ordered, show_figure, alpha_shape):
         feb = max(feb, cur_feb)
         feb_index += 1
 
-    if show_figure:
+    if not show_figure:
         max_feb_points = rotated_list[max_feb_index]
         # top point, 1st POIs
         p_top = []
@@ -174,7 +174,7 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered, sho
             fbml = dis_cur
             p_third = right_bone_points_ordered[i]
 
-    if show_figure:
+    if not show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
         ax.plot(x, y)

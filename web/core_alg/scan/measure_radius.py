@@ -21,14 +21,14 @@ def tune_params(device):
         rml_coeff = 1
         rmld_coeff = 1
     else:
-        rml_coeff = 0.996
-        rmld_coeff = 1.035
+        rml_coeff = 1
+        rmld_coeff = 1
 
 
 def get_rml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
     rml = max_x - min_x
-    if show_figure:
+    if not show_figure:
         # most left point, 1st POIs
         p_left = []
         for i in range(len(left_bone_points_ordered)):

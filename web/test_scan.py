@@ -28,11 +28,11 @@ _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 show_figure = False
 bone_type = Bone.Type.HUMERUS
 # switch for structure sensor/ iphone10/ MarkII
-folder = Filefolder.Type.UIC7_L
+folder = Filefolder.Type.UIC6_R
 
 # process more files
-multi_files = False
-index_default = 1
+multi_files = True
+index_default = 2
 number_of_file = 3
 
 

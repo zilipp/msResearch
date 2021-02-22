@@ -24,15 +24,15 @@ def tune_params(device):
         heb_coeff = 1
         hhd_coeff = 1
     else:
-        hml_coeff = 0.996
-        heb_coeff = 0.99
-        hhd_coeff = 0.965
+        hml_coeff = 1
+        heb_coeff = 1
+        hhd_coeff = 1
 
 def get_hml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, _min_y, max_x, _max_y) = alpha_shape.exterior.bounds
     hml = max_x - min_x
 
-    if show_figure:
+    if not show_figure:
         # most left point, 1st POIs
         p_left = []
         for i in range(len(left_bone_points_ordered)):
@@ -80,7 +80,7 @@ def get_heb(left_bone, show_figure, left_bone_points_ordered, alpha_shape):
         max_y = rotated_points.max(axis=0)[1]
         min_y = rotated_points.min(axis=0)[1]
         cur_heb = max_y - min_y
-        if cur_heb > heb:
+        if cur_heb >= heb:
             heb = cur_heb
             max_heb_index = heb_index
             point_a_y = max_y
@@ -89,7 +89,7 @@ def get_heb(left_bone, show_figure, left_bone_points_ordered, alpha_shape):
         heb = max(heb, cur_heb)
         heb_index += 1
 
-    if show_figure:
+    if not show_figure:
         max_feb_points = rotated_list[max_heb_index]
         # top point, 1st POIs
         p_top = []
@@ -146,8 +146,18 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
         if y_delta > y_delta_max:
             y_delta_max = y_delta
             upper_point_a_idx = i
+
+    dis_delta_max = 0
+    for i in range(upper_point_a_idx - 2, upper_point_a_idx + 2):
+        x_delta = convex_hull[i][0] - convex_hull[i + 1][0]
+        y_delta = convex_hull[i][1] - convex_hull[i + 1][1]
+        dis_delta = x_delta ** 2 + y_delta ** 2
+        if dis_delta > dis_delta_max:
+            dis_delta_max = dis_delta
+            upper_point_a_idx = i
+
     point_a = convex_hull[upper_point_a_idx]
-    point_b = convex_hull[upper_point_a_idx+1]
+    point_b = convex_hull[upper_point_a_idx + 1]
 
     point_a_idx = [i for i, x_y in enumerate(
         right_region_points_ordered) if x_y[0] == point_a[0]]
@@ -184,7 +194,7 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
             point_d_idx = i-1
     point_d = convex_hull[point_d_idx]
 
-    if show_figure:
+    if not show_figure:
         fig, ax = plt.subplots()
 
         data = np.asarray(right_region_points_ordered)
