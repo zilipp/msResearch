@@ -14,21 +14,20 @@ from core_alg.utilities import bone_region_util
 def tune_params(device):
     # parameter to tune error
     global rml_coeff, rmld_coeff
-    if device == Filefolder.Type.SENSOR_I:
-        rml_coeff = 0.996
-        rmld_coeff = 1.035
-    elif device == Filefolder.Type.IPHONE_TEN:
-        rml_coeff = 1
-        rmld_coeff = 1
-    else:
-        rml_coeff = 1
-        rmld_coeff = 1
+    # if device == Filefolder.Type.SENSOR_I:
+    #     rml_coeff = 0.996
+    #     rmld_coeff = 1.035
+    # else:
+    #     rml_coeff = 0.9922
+    #     rmld_coeff = 0.8171
+    rml_coeff = 1
+    rmld_coeff = 1
 
 
 def get_rml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
     rml = max_x - min_x
-    if not show_figure:
+    if show_figure:
         # most left point, 1st POIs
         p_left = []
         for i in range(len(left_bone_points_ordered)):
@@ -118,7 +117,7 @@ def get_rmld(center_bone_points, show_figure, alpha_shape):
     return rmld
 
 
-def get_measurement(radius, show_figure, device=Filefolder.Type.SENSOR_I):
+def get_measurement(radius, show_figure, device=None):
     logging.info('Start measuring radius...')
 
     tune_params(device)

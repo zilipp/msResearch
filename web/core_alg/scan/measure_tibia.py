@@ -13,15 +13,14 @@ from core_alg.utilities import rotate_utils
 def tune_params(device):
     # parameter to tune error
     global tml_coeff, tpb_coeff
-    if device == Filefolder.Type.SENSOR_I:
-        tml_coeff = 0.995
-        tpb_coeff = 0.985
-    elif device == Filefolder.Type.IPHONE_TEN:
-        tml_coeff = 1
-        tpb_coeff = 1
-    else:
-        tml_coeff = 1
-        tpb_coeff = 1
+    # if device == Filefolder.Type.SENSOR_I:
+    #     tml_coeff = 0.995
+    #     tpb_coeff = 0.985
+    # else:
+    #     tml_coeff = 0.9988
+    #     tpb_coeff = 0.9584
+    tml_coeff = 1
+    tpb_coeff = 1
 
 
 def get_tml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
@@ -143,7 +142,7 @@ def get_tpb(alpha_shape, show_figure, left_bone, left_bone_points_ordered):
     return tpb
 
 
-def get_measurement(tibia, show_figure, device=Filefolder.Type.SENSOR_I):
+def get_measurement(tibia, show_figure, device=None):
     logging.info('Start measuring tibia')
     tune_params(device)
 

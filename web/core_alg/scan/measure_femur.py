@@ -16,24 +16,24 @@ from core_alg.utilities import rotate_utils
 def tune_params(device):
     global fml_coeff, feb_coeff, fbml_coeff, fmld_coeff, fhd_coeff
 
-    if device == Filefolder.Type.SENSOR_I:
-        fml_coeff = 0.997
-        feb_coeff = 0.995
-        fbml_coeff = 0.997
-        fmld_coeff = 0.958
-        fhd_coeff = 0.971
-    elif device == Filefolder.Type.IPHONE_TEN:
-        fml_coeff = 1
-        feb_coeff = 1
-        fbml_coeff = 1
-        fmld_coeff = 1
-        fhd_coeff = 1
-    else:
-        fml_coeff = 1
-        feb_coeff = 1
-        fbml_coeff = 1
-        fmld_coeff = 1
-        fhd_coeff = 1
+    # if device == Filefolder.Type.SENSOR_I:
+    #     fml_coeff = 0.997
+    #     feb_coeff = 0.995
+    #     fbml_coeff = 0.997
+    #     fmld_coeff = 0.958
+    #     fhd_coeff = 0.971
+    # else:
+    #     fml_coeff = 1.0040
+    #     feb_coeff = 0.9732
+    #     fbml_coeff = 1.0037
+    #     fmld_coeff = 0.9604
+    #     fhd_coeff = 0.9828
+
+    fml_coeff = 1
+    feb_coeff = 1
+    fbml_coeff = 1
+    fmld_coeff = 1
+    fhd_coeff = 1
 
 
 
@@ -98,7 +98,7 @@ def get_feb(left_bone, left_bone_points_ordered, show_figure, alpha_shape):
         feb = max(feb, cur_feb)
         feb_index += 1
 
-    if not show_figure:
+    if show_figure:
         max_feb_points = rotated_list[max_feb_index]
         # top point, 1st POIs
         p_top = []
@@ -212,7 +212,7 @@ def get_fmld(center_bone_points, show_figure, alpha_shape):
         center_bone_points_lower, show_figure)
     # print(top_line_p, bottom_line_p)
 
-    if show_figure:
+    if not show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
         ax.plot(x, y)
@@ -379,7 +379,7 @@ def get_fhd(right_bone, right_bone_points_ordered, show_figure, alpha_shape):
     return fhd
 
 
-def get_measurement(femur, show_figure, device=Filefolder.Type.SENSOR_I):
+def get_measurement(femur, show_figure, device=None):
     logging.info('Start measuring femur')
 
     tune_params(device)

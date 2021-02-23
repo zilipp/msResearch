@@ -15,18 +15,18 @@ def tune_params(device):
     # parameter to tune error
     global hml_coeff, heb_coeff, hhd_coeff
 
-    if device == Filefolder.Type.SENSOR_I:
-        hml_coeff = 0.996
-        heb_coeff = 0.994
-        hhd_coeff = 0.965
-    elif device == Filefolder.Type.IPHONE_TEN:
-        hml_coeff = 1
-        heb_coeff = 1
-        hhd_coeff = 1
-    else:
-        hml_coeff = 1
-        heb_coeff = 1
-        hhd_coeff = 1
+    # if device == Filefolder.Type.SENSOR_I:
+    #     hml_coeff = 0.996
+    #     heb_coeff = 0.994
+    #     hhd_coeff = 0.965
+    # else:
+    #     hml_coeff = 0.9986
+    #     heb_coeff = 0.9516
+    #     hhd_coeff = 0.9388
+    hml_coeff = 1
+    heb_coeff = 1
+    hhd_coeff = 1
+
 
 def get_hml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, _min_y, max_x, _max_y) = alpha_shape.exterior.bounds
@@ -234,7 +234,7 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
     return hhd
 
 
-def get_measurement(humerus, show_figure, device=Filefolder.Type.SENSOR_I):
+def get_measurement(humerus, show_figure, device=None):
     logging.info('Start measuring humerus...')
 
     tune_params(device)
