@@ -14,14 +14,12 @@ from core_alg.utilities import bone_region_util
 def tune_params(device):
     # parameter to tune error
     global rml_coeff, rmld_coeff
-    # if device == Filefolder.Type.SENSOR_I:
-    #     rml_coeff = 0.996
-    #     rmld_coeff = 1.035
-    # else:
-    #     rml_coeff = 0.9922
-    #     rmld_coeff = 0.8171
-    rml_coeff = 1
-    rmld_coeff = 1
+    if device is None:
+        rml_coeff = 0.9921
+        rmld_coeff = 0.8179
+    else:
+        rml_coeff = 0.996
+        rmld_coeff = 1.035
 
 
 def get_rml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):

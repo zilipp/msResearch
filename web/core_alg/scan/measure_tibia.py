@@ -13,14 +13,12 @@ from core_alg.utilities import rotate_utils
 def tune_params(device):
     # parameter to tune error
     global tml_coeff, tpb_coeff
-    # if device == Filefolder.Type.SENSOR_I:
-    #     tml_coeff = 0.995
-    #     tpb_coeff = 0.985
-    # else:
-    #     tml_coeff = 0.9988
-    #     tpb_coeff = 0.9584
-    tml_coeff = 1
-    tpb_coeff = 1
+    if device is None:
+        tml_coeff = 0.9987
+        tpb_coeff = 0.9583
+    else:
+        tml_coeff = 0.995
+        tpb_coeff = 0.985
 
 
 def get_tml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
@@ -43,7 +41,7 @@ def get_tml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
     poi_x = min(min_x_left_upper, min_x_left_lower)
     tml = max_x - poi_x
 
-    if not show_figure:
+    if show_figure:
         # most left point, 1st POIs
         # possibly POI is the intersection with box and bone,
         # x != poi_x, the point is on the box
@@ -111,7 +109,7 @@ def get_tpb(alpha_shape, show_figure, left_bone, left_bone_points_ordered):
         tpb = max(tpb, cur_tpb)
         tpb_index += 1
 
-    if not show_figure:
+    if show_figure:
         max_feb_points = rotated_list[max_tpb_index]
         # top point, 1st POIs
         p_top = []

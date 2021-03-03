@@ -1,5 +1,4 @@
 # python libraries
-from django.http import JsonResponse
 import json
 import logging
 import numpy as np
@@ -7,7 +6,6 @@ import os
 import open3d as o3d
 from pathlib import Path
 import pywavefront
-
 
 # self defined functions
 from core_alg.base import Bone
@@ -67,7 +65,7 @@ class AutoMeasurement(object):
 
         # 2. 3D model pre-processing
         alpha_shape = image_process.preprocess_bone(
-            scan_pcd, self.bone_type, show_figure=False,device=Filefolder.Type.MARK_II)
+            scan_pcd, self.bone_type, show_figure=False,device=Filefolder.Type.UIC4)
         bone.set_alpha_shape(alpha_shape)
 
         # 3 Measurements

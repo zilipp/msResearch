@@ -16,32 +16,25 @@ from core_alg.utilities import rotate_utils
 def tune_params(device):
     global fml_coeff, feb_coeff, fbml_coeff, fmld_coeff, fhd_coeff
 
-    # if device == Filefolder.Type.SENSOR_I:
-    #     fml_coeff = 0.997
-    #     feb_coeff = 0.995
-    #     fbml_coeff = 0.997
-    #     fmld_coeff = 0.958
-    #     fhd_coeff = 0.971
-    # else:
-    #     fml_coeff = 1.0040
-    #     feb_coeff = 0.9732
-    #     fbml_coeff = 1.0037
-    #     fmld_coeff = 0.9604
-    #     fhd_coeff = 0.9828
-
-    fml_coeff = 1
-    feb_coeff = 1
-    fbml_coeff = 1
-    fmld_coeff = 1
-    fhd_coeff = 1
-
+    if device is None:
+        fml_coeff = 1.0035
+        feb_coeff = 0.9728
+        fbml_coeff = 1.0036
+        fmld_coeff = 0.9573
+        fhd_coeff = 0.9829
+    else:
+        fml_coeff = 0.997
+        feb_coeff = 0.995
+        fbml_coeff = 0.997
+        fmld_coeff = 0.958
+        fhd_coeff = 0.971
 
 
 def get_fml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, min_y, max_x, max_y) = alpha_shape.exterior.bounds
     fml = max_x - min_x
 
-    if not show_figure:
+    if show_figure:
         # most left point, 1st POIs
         p_left = []
         for i in range(len(left_bone_points_ordered)):
@@ -174,7 +167,7 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered, sho
             fbml = dis_cur
             p_third = right_bone_points_ordered[i]
 
-    if not show_figure:
+    if show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
         ax.plot(x, y)
@@ -212,7 +205,7 @@ def get_fmld(center_bone_points, show_figure, alpha_shape):
         center_bone_points_lower, show_figure)
     # print(top_line_p, bottom_line_p)
 
-    if not show_figure:
+    if show_figure:
         fig, ax = plt.subplots()
         x, y = alpha_shape.exterior.xy
         ax.plot(x, y)

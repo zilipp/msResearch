@@ -26,9 +26,9 @@ _user_result_dir = os.path.join(_out_root_dir, 'out', 'core_alg', 'results')
 
 # switch for figure
 show_figure = False
-bone_type = Bone.Type.HUMERUS
+bone_type = Bone.Type.RADIUS
 # switch for structure sensor/ iphone10/ MarkII
-folder = Filefolder.Type.NEW_UIC6_R
+folder = Filefolder.Type.UIC10_R
 
 # process more files
 multi_files = True

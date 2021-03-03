@@ -15,24 +15,21 @@ def tune_params(device):
     # parameter to tune error
     global hml_coeff, heb_coeff, hhd_coeff
 
-    # if device == Filefolder.Type.SENSOR_I:
-    #     hml_coeff = 0.996
-    #     heb_coeff = 0.994
-    #     hhd_coeff = 0.965
-    # else:
-    #     hml_coeff = 0.9986
-    #     heb_coeff = 0.9516
-    #     hhd_coeff = 0.9388
-    hml_coeff = 1
-    heb_coeff = 1
-    hhd_coeff = 1
+    if device is None:
+        hml_coeff = 0.9989
+        heb_coeff = 0.9519
+        hhd_coeff = 0.9441
+    else:
+        hml_coeff = 0.996
+        heb_coeff = 0.994
+        hhd_coeff = 0.965
 
 
 def get_hml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_points_ordered):
     (min_x, _min_y, max_x, _max_y) = alpha_shape.exterior.bounds
     hml = max_x - min_x
 
-    if not show_figure:
+    if show_figure:
         # most left point, 1st POIs
         p_left = []
         for i in range(len(left_bone_points_ordered)):
@@ -89,7 +86,7 @@ def get_heb(left_bone, show_figure, left_bone_points_ordered, alpha_shape):
         heb = max(heb, cur_heb)
         heb_index += 1
 
-    if not show_figure:
+    if show_figure:
         max_feb_points = rotated_list[max_heb_index]
         # top point, 1st POIs
         p_top = []
@@ -194,7 +191,7 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
             point_d_idx = i-1
     point_d = convex_hull[point_d_idx]
 
-    if not show_figure:
+    if show_figure:
         fig, ax = plt.subplots()
 
         data = np.asarray(right_region_points_ordered)
