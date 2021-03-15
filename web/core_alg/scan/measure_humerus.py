@@ -193,6 +193,28 @@ def get_hhd(bone_right_region, right_region_points_ordered, show_figure, alpha_s
 
     if show_figure:
         fig, ax = plt.subplots()
+        x, y = bone_right_region.exterior.xy
+        ax.plot(x, y)
+        ax.set_aspect('equal')
+        plt.show()
+
+    if show_figure:
+        fig, ax = plt.subplots()
+
+        data = np.asarray(right_region_points_ordered)
+        x = data[:, 0].tolist()
+        y = data[:, 1].tolist()
+        ax.scatter(x, y, marker='o')
+
+        data = np.asarray(convex_hull)
+        x = data[:, 0].tolist()
+        y = data[:, 1].tolist()
+        ax.scatter(x, y, marker='o', facecolor='g')
+        ax.set_aspect('equal')
+        plt.show()
+
+    if show_figure:
+        fig, ax = plt.subplots()
 
         data = np.asarray(right_region_points_ordered)
         x = data[:, 0].tolist()
