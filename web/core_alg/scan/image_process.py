@@ -24,6 +24,7 @@ def tune_params(device):
 
     if device == Filefolder.Type.SENSOR_I:
         # params for remove background
+        logging.info("sensor1")
         distance_threshold_femur = 3
         distance_threshold_humerus = 3
         distance_threshold_radius = 3
@@ -35,7 +36,7 @@ def tune_params(device):
         nb_neighbors_radius = 20
         nb_neighbors_humerus = 20
 
-        std_ratio_femur = 0.5
+        std_ratio_femur = 1.8
         std_ratio_radius = 2
         std_ratio_humerus = 2
 
@@ -55,7 +56,7 @@ def tune_params(device):
         nb_neighbors_radius = 20
         nb_neighbors_humerus = 20
 
-        std_ratio_femur = 1
+        std_ratio_femur = 1.8
         std_ratio_radius = 2
         std_ratio_humerus = 2
 
