@@ -27,29 +27,31 @@ def get_tml(alpha_shape, show_figure, left_bone_points_ordered, right_bone_point
     y_length = max_y - min_y
 
     # left-upper box
-    left_upper_box = Polygon([(min_x, min_y + y_length * 0.75), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y + y_length * 0.75)])
-    left_upper_bone = alpha_shape.intersection(left_upper_box)
-    (min_x_left_upper, _, _, _) = left_upper_bone.exterior.bounds
-
+    # left_upper_box = Polygon([(min_x, min_y + y_length * 0.75), (min_x, max_y), (min_x + x_length / 10, max_y), (min_x + x_length / 10, min_y + y_length * 0.75)])
+    # left_upper_bone = alpha_shape.intersection(left_upper_box)
+    # (min_x_left_upper, _, _, _) = left_upper_bone.exterior.bounds
 
     # left-lower box
+    # only consider lower part
     left_lower_box = Polygon([(min_x, min_y), (min_x, min_y + y_length * 0.25), (min_x + x_length / 10, min_y + y_length * 0.25),
                               (min_x + x_length / 10,  min_y)])
     left_lower_bone = alpha_shape.intersection(left_lower_box)
     (min_x_left_lower, _, _, _) = left_lower_bone.exterior.bounds
 
-    poi_x = min(min_x_left_upper, min_x_left_lower)
+    # poi_x = min(min_x_left_upper, min_x_left_lower)
+    poi_x = min_x_left_lower
     tml = max_x - poi_x
 
-    if show_figure:
+    if not show_figure:
         # most left point, 1st POIs
         # possibly POI is the intersection with box and bone,
         # x != poi_x, the point is on the box
         p_left = []
         box_min_y = min_y + y_length * 0.25
-        box_max_y = min_y + y_length * 0.75
+        # box_max_y = min_y + y_length * 0.75
         for i in range(len(left_bone_points_ordered)):
-            if box_max_y > left_bone_points_ordered[i][1] > box_min_y:
+            # if box_max_y > left_bone_points_ordered[i][1] > box_min_y:
+            if left_bone_points_ordered[i][1] > box_min_y:
                 continue
             if left_bone_points_ordered[i][0] - poi_x < 1:
                 p_left = left_bone_points_ordered[i]
