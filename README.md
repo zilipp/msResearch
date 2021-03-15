@@ -1,7 +1,7 @@
 # An automatic tool for bone measurement
 
 # Table of contents
-1. [Structure of the project](#project structure)
+1. [The structure of the project](#project structure)
 2. [Core algorithms](#algorithms)
 3. [Instructions on web application](#web app)
     1. [Structure of the Django project](#django project)
