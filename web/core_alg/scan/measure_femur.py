@@ -146,7 +146,7 @@ def get_fbml(left_bone, left_bone_points_ordered, right_bone_points_ordered, sho
     x_min_point = None
     x_min_point_index = 0
 
-    # 如果最小的点不是线段头上的前十个点，说明它是P2
+    # if min point is not the first 5 points, then it will be p2
     while x_min_point_index < 5:
         # delete point_b(start point of left box) to current_point, fine the most left point in remaining points
         left_bone_points_ordered = left_bone_points_ordered[x_min_point_index + 1:]
@@ -302,15 +302,18 @@ def get_fhd(right_bone, right_bone_points_ordered, show_figure, alpha_shape):
     # print('start: ', p_start)
     # print('start2: ', p_start_2)
 
-    # 6. 计算出点tmp_point2到 tmp_line上的投影点tmp_point3 然后算出来 start_point到tmp_point3的距离dist
-    # 把dist存入一个list
+    # 6. project of tmp_point2 to tmp_line, tmp_point3
+    # calculate the distance from start_point  to tmp_point3 : dist
+    # save dist to a list
     fhd = distance_util.distance_point_to_point(p_start, p_start_2)
     count_decrease = 0
 
-    # 7. start_point开始，向上遍历点 tmp_point1， 更新tmp_line   tmp_point1_y = tmp1_point_x+b
-    # 8. 每次遍历，找到在上次tmp_point2附近的一个新点，使得新点到直线tmp_line距离最短
-    # tmp_point2更新为新的点，然后计算tmp_point2在直线tmp_line上的投影tmp_point3 到 tmp_point1的距离，存入dist list
-    # 依次循环,dist应该先增大，后减小，我们要找到的就是增到极大值，开始减小时候的那个极大的距离
+    # 7. from start_point，traverse points upside tmp_point1， update tmp_line   tmp_point1_y = tmp1_point_x+b
+    # 8. for each iteration, find a new point around tmp_point2, s.t. the distance from new point to tmp_line minimum
+    # update tmp_point2，then calculate the projection of tmp_point2 on tmp_line,
+    # tmp_point3 to tmp_point1的, append to dist list
+    # iterate, dist should increase then decrease
+    # we need to find maximum of the value, and the time when decreasing
 
     def find_down_left(p1, from_idx, right_bone_points_ordered_array):
         cur_intercept = p1[1] - p1[0]
