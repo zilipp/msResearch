@@ -87,8 +87,8 @@ The other four file are algorithms for four type of bones. Please see details in
 In `/utilies`, we defined some helper functions such us calculating distance from a point to a line.
 
 
-## 3. Instructions on web application  <a name="django project"></a>
-### 3.1 Structure of the Django project<a name="web app"></a>
+## 3. Instructions on web application  <a name="web app"></a>
+### 3.1 Structure of the Django project<a name="django project"></a>
 The folder `/web` is the root directory of the Django project.
 
 The folder `/measurebone` contains settings (urlpatterns, view, etc.) and 
@@ -106,7 +106,7 @@ python manage.py runserver
 The web application will run locally: http://127.0.0.1:8000/
 
 
-## 4 Instructions on Heroku deployment <a name="heroku"></a>
+## 4. Instructions on Heroku deployment <a name="heroku"></a>
 1. creat an account on Heroku and install Heroku CLI on the machine: 
 https://www.heroku.com/
 
