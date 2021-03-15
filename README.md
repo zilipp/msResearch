@@ -129,7 +129,7 @@ https://www.heroku.com/
 
 1. push repo to heroku repo, then we have an link to the web app
     ```bash
-    git push heroku master
+    git subtree push --prefix web heroku master
     ```
    
 1. check logs on Heroku:
@@ -145,9 +145,6 @@ https://www.youtube.com/watch?v=GMbVzl_aLxM&ab_channel=PrettyPrinted
 
 Subtree: \
 https://medium.com/@shalandy/deploy-git-subdirectory-to-heroku-ea05e95fce1f
-```bash
-git subtree push --prefix web heroku master
-```
 
 Buildpack: \
 https://github.com/heroku/heroku-buildpack-apt
