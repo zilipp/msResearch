@@ -1,11 +1,11 @@
 # An automatic tool for bone measurement
 
 # Table of contents
-1. [The structure of the project](#project structure)
+1. [The structure of the project](#projectstructure)
 2. [Core algorithms](#algorithms)
-3. [Instructions on web application](#web app)
-    1. [Structure of the Django project](#django project)
-    1. [Running locally](#local run)
+3. [Instructions on web application](#webapp)
+    1. [Structure of the Django project](#djangoproject)
+    1. [Running locally](#localrun)
 4. [Instructions on Heroku deployment](#heroku)
 5. [Other resources](#resources)
 
@@ -87,8 +87,8 @@ The other four file are algorithms for four type of bones. Please see details in
 In `/utilies`, we defined some helper functions such us calculating distance from a point to a line.
 
 
-## 3. Instructions on web application  <a name="web app"></a>
-### 3.1 Structure of the Django project<a name="django project"></a>
+## 3. Instructions on web application  <a name="webapp"></a>
+### 3.1 Structure of the Django project<a name="djangoproject"></a>
 The folder `/web` is the root directory of the Django project.
 
 The folder `/measurebone` contains settings (urlpatterns, view, etc.) and 
@@ -98,7 +98,7 @@ The folder `/analysis` is the root directory of the measurements app.
 
 For more details of Django Framework, please refer:  https://docs.djangoproject.com/en/3.1/
 
-### 3.2 Running locally <a name="local run"></a>
+### 3.2 Running locally <a name="localrun"></a>
 Change current directory to `/web`, and run 
 ```bash
 python manage.py runserver
